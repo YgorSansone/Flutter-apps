@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'tarefa.dart';
-
 void main() {
   runApp(new TodoListApp());
 }
@@ -32,7 +31,6 @@ class ListaScreenState extends State<ListaScreen> {
     setState(() {
       tarefas.add(Tarefa(nome));
     });
-
     controller.clear();
   }
 
@@ -54,7 +52,7 @@ class ListaScreenState extends State<ListaScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(tarefa.nome, style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),),
-            Text(tarefa.data.toIso8601String()) // Intl
+            Text(tarefa.data) // Intl
           ],
         )
       ],

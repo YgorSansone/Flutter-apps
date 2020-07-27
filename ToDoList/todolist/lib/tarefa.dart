@@ -1,12 +1,13 @@
 class Tarefa
 {
   String nome;
-  DateTime data;
+  String data;
   bool concluida;
 
   Tarefa(String nome) {
     this.concluida = false;
     this.nome = nome;
-    this.data = DateTime.now();
+    DateTime now = DateTime.now();
+    this.data = now.day.toString()+ "/" + now.month.toString() + " - " + now.hour.toString() + ":" + now.minute.toString();
   }
 }
