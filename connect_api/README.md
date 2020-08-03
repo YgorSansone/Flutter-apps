@@ -1,8 +1,7 @@
-# caraoucoroa
+# connect_api
 
-Cara ou coroa
-![alt text](https://raw.githubusercontent.com/YgorSansone/Flutter-apps/master/caraoucoroa/screenshot0.png)
-![alt text](https://raw.githubusercontent.com/YgorSansone/Flutter-apps/master/caraoucoroa/screenshot1.png)
+A new Flutter application.
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
