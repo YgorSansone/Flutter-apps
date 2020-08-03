@@ -1,10 +1,9 @@
 # caraoucoroa
 
 Cara ou coroa
-![Home]
-(https://raw.githubusercontent.com/YgorSansone/Flutter-apps/master/caraoucoroa/screenshot0.png)
-![Jogo]
-(https://raw.githubusercontent.com/YgorSansone/Flutter-apps/master/caraoucoroa/screenshot1.png)
+
+![alt text](https://raw.githubusercontent.com/YgorSansone/Flutter-apps/master/caraoucoroa/screenshot0.png)
+![alt text](https://raw.githubusercontent.com/YgorSansone/Flutter-apps/master/caraoucoroa/screenshot1.png)
 
 ## Getting Started
 
