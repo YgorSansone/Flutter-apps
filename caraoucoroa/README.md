@@ -2,9 +2,9 @@
 
 Cara ou coroa
 ![Home]
-(https://github.com/YgorSansone/Flutter-apps/blob/master/caraoucoroa/screenshot0.png)
+(https://raw.githubusercontent.com/YgorSansone/Flutter-apps/master/caraoucoroa/screenshot0.png)
 ![Jogo]
-(https://github.com/YgorSansone/Flutter-apps/blob/master/caraoucoroa/screenshot1.png)
+(https://raw.githubusercontent.com/YgorSansone/Flutter-apps/master/caraoucoroa/screenshot1.png)
 
 ## Getting Started
 
