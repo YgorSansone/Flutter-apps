@@ -26,64 +26,116 @@ class _HomeState extends State<Home> {
      }
      return postagens;
     }
+    List<Photos> postagensfotos = List();
     Future<List<Photos>> _recuperarImagens() async{
       http.Response response = await http.get(_urlBase + "photos");
       var dadosJson = jsonDecode(response.body);
-      List<Photos> postagensfotos = List();
       for(var photos in dadosJson){
         Photos p = Photos(photos["albumId"], photos["id"], photos["title"], photos["url"], photos["thumbnailUrl"]);
         postagensfotos.add(p);
       }
       return postagensfotos;
     }
+    _post() async{
+     var corpo = jsonEncode(
+         {
+           "albumId": 120,
+           "id": null,
+           "title": "TESTE",
+           "url": "https://s3.amazonaws.com/sample-login/companies/avatars/000/000/837/original/Logo-b2w-600x600.png?1520354461",
+           "thumbnailUrl": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fforum.muaway.net%2Findex.php%3F%2Fuser%2F155467-ch4cky%2F&psig=AOvVaw24Cera25mJ4ZjRvJeQCPGN&ust=1596751430355000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCMCa8uCIhesCFQAAAAAdAAAAABAD"
+         }
+     );
+     http.Response response = await http.post(_urlBase + "posts",
+     headers: {
+       "Content-type": "application/json; charset=UTF-8"
+     },
+     body: corpo
+     );
+     print("Resposta: ${response.statusCode}");
+     print("Resposta: ${response.body}");
+     print("ESSE -  ${response.body}");
+    }
+    _put(){
+    }
+    _patch(){
+    }
+    _delete(){
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Consumo de servico avancado"),
       ),
-      body: FutureBuilder<List<Photos>>(
-        future: _recuperarImagens(),
-        builder: (context, snapshot){
-          switch( snapshot.connectionState ){
-            case ConnectionState.none :
-              print("None");
-              break;
-            case ConnectionState.waiting :
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-              break;
-            case ConnectionState.active :
-            case ConnectionState.done :
-              print("done");
-              if(snapshot.hasError){
-                print("erro");
-              }else{
-                print("lista");
-                return ListView.builder(
-                  itemCount: snapshot.data.length,
-                    itemBuilder: (context,index){
-                    List<Photos> lista = snapshot.data;
-                    Photos post = lista[index];
-                    return Column(
-                      children: <Widget>[
-                      ListTile(
-                      title: Text(post.title),
-                      subtitle: Text(post.id.toString()),
-                      ),
-                        Image.network(post.url),
-                        Image.network(post.thumbnailUrl),
-                      ],
-                    );
+      body: Container(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                RaisedButton(
+                  child: Text("Salvar"),
+                  onPressed: _post,
+                ),
+                RaisedButton(
+                  child: Text("Editar"),
+                  onPressed: _post,
+                ),
+                RaisedButton(
+                  child: Text("Remover"),
+                  onPressed: _post,
+                ),
+              ],
+            ),
+            Expanded(
+                child:             FutureBuilder<List<Photos>>(
+                  future: _recuperarImagens(),
+                  builder: (context, snapshot){
+                    switch( snapshot.connectionState ){
+                      case ConnectionState.none :
+                        print("None");
+                        break;
+                      case ConnectionState.waiting :
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                        break;
+                      case ConnectionState.active :
+                      case ConnectionState.done :
+                        print("done");
+                        if(snapshot.hasError){
+                          print("erro");
+                        }else{
+                          print("lista");
+                          return ListView.builder(
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (context,index){
+                                List<Photos> lista = snapshot.data;
+                                Photos post = lista[index];
+                                return Column(
+                                  children: <Widget>[
+                                    ListTile(
+                                      title: Text(post.title),
+                                      subtitle: Text(post.id.toString()),
+                                    ),
+                                    Image.network(post.url),
+                                    Image.network(post.thumbnailUrl),
+                                  ],
+                                );
+                              }
+                          );
+                        }
+                        break;
                     }
-                );
-              }
-              break;
-          }
-          return Center(
-            child: Text(" "),
-          );
-        },
+                    return Center(
+                      child: Text(" "),
+                    );
+                  },
+                ),
+            ),
+
+          ],
+        ),
       ),
     );
   }
