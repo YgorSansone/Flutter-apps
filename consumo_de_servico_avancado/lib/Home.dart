@@ -26,16 +26,13 @@ class _HomeState extends State<Home> {
      }
      return postagens;
     }
-    List<Photos> postagensfotos = List();
+
+    Photos  photo = new  Photos(120, null , "Titulo", "https://s3.amazonaws.com/sample-login/companies/avatars/000/000/837/original/Logo-b2w-600x600.png?1520354461", "https://s3.amazonaws.com/sample-login/companies/avatars/000/000/837/original/Logo-b2w-600x600.png?1520354461");
     var corpo = jsonEncode(
-        {
-//          "albumId": null,
-          "id": null,
-//          "title": null,
-          "url": "https://s3.amazonaws.com/sample-login/companies/avatars/000/000/837/original/Logo-b2w-600x600.png?1520354461",
-          "thumbnailUrl": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fforum.muaway.net%2Findex.php%3F%2Fuser%2F155467-ch4cky%2F&psig=AOvVaw24Cera25mJ4ZjRvJeQCPGN&ust=1596751430355000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCMCa8uCIhesCFQAAAAAdAAAAABAD"
-        }
+      photo.toJson(),
     );
+
+    List<Photos> postagensfotos = List();
     Future<List<Photos>> _recuperarImagens() async{
       http.Response response = await http.get(_urlBase + "photos");
       var dadosJson = jsonDecode(response.body);
@@ -45,15 +42,21 @@ class _HomeState extends State<Home> {
       }
       return postagensfotos;
     }
+
     void printar(response){
-      print("Resposta: ${response.statusCode}");
-      print("Resposta: ${response.body}");
+      print("Status: ${response.statusCode}");
+      if(response.statusCode >= 200 && response.statusCode < 300){
+        print("Deu certo");
+        print("Resposta: ${response.body}");
+      }else{
+        print("Deu errado");
+      }
     }
 
     _post() async{
-     http.Response response = await http.post(_urlBase + "posts",
-     headers: {"Content-type": "application/json; charset=UTF-8"},
-     body: corpo);
+      http.Response response = await http.post(_urlBase + "posts",
+          headers:{"Content-type": "application/json; charset=UTF-8"},
+          body: corpo);
      printar(response);
     }
 
@@ -72,8 +75,11 @@ class _HomeState extends State<Home> {
     }
 
     _delete() async{
-
+      http.Response response = await http.patch(_urlBase +"posts/" +"2");
+      printar(response);
     }
+
+
 
     return Scaffold(
       appBar: AppBar(
@@ -91,8 +97,8 @@ class _HomeState extends State<Home> {
                 ),
                 RaisedButton(
                   child: Text("Editar"),
-                  onPressed: _patch,
-//                  onPressed: _put,
+//                  onPressed: _patch,
+                  onPressed: _put,
                 ),
                 RaisedButton(
                   child: Text("Remover"),
