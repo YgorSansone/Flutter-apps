@@ -7,6 +7,16 @@ class Photos{
 
   Photos(this._albumId, this._id, this._title, this._url, this._thumbnailUrl);
 
+  Map toJson(){
+    return{
+      "albumId": _albumId,
+      "id": _id,
+      "title": _title,
+      "url": _url,
+      "thumbnailUrl": _thumbnailUrl
+    };
+  }
+
   String get thumbnailUrl => _thumbnailUrl;
 
   set thumbnailUrl(String value) {
