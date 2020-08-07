@@ -29,9 +29,9 @@ class _HomeState extends State<Home> {
     List<Photos> postagensfotos = List();
     var corpo = jsonEncode(
         {
-          "albumId": 120,
+//          "albumId": null,
           "id": null,
-          "title": "TESTE",
+//          "title": null,
           "url": "https://s3.amazonaws.com/sample-login/companies/avatars/000/000/837/original/Logo-b2w-600x600.png?1520354461",
           "thumbnailUrl": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fforum.muaway.net%2Findex.php%3F%2Fuser%2F155467-ch4cky%2F&psig=AOvVaw24Cera25mJ4ZjRvJeQCPGN&ust=1596751430355000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCMCa8uCIhesCFQAAAAAdAAAAABAD"
         }
@@ -45,26 +45,34 @@ class _HomeState extends State<Home> {
       }
       return postagensfotos;
     }
+    void printar(response){
+      print("Resposta: ${response.statusCode}");
+      print("Resposta: ${response.body}");
+    }
+
     _post() async{
      http.Response response = await http.post(_urlBase + "posts",
-     headers: {
-       "Content-type": "application/json; charset=UTF-8"
-     },
-     body: corpo
-     );
-     print("Resposta: ${response.statusCode}");
-     print("Resposta: ${response.body}");
+     headers: {"Content-type": "application/json; charset=UTF-8"},
+     body: corpo);
+     printar(response);
     }
+
     _put() async{
       http.Response response = await http.put(_urlBase + "posts/2",
           headers:{"Content-type": "application/json; charset=UTF-8"},
           body: corpo);
-      print("Resposta: ${response.statusCode}");
-      print("Resposta: ${response.body}");
+      printar(response);
     }
+
     _patch() async{
+      http.Response response = await http.patch(_urlBase + "posts/2",
+          headers:{"Content-type": "application/json; charset=UTF-8"},
+          body: corpo);
+      printar(response);
     }
+
     _delete() async{
+
     }
 
     return Scaffold(
@@ -83,7 +91,8 @@ class _HomeState extends State<Home> {
                 ),
                 RaisedButton(
                   child: Text("Editar"),
-                  onPressed: _put,
+                  onPressed: _patch,
+//                  onPressed: _put,
                 ),
                 RaisedButton(
                   child: Text("Remover"),
