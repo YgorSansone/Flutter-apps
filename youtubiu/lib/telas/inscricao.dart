@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:youtube/Api.dart';
-class Inicio extends StatefulWidget {
+class Inscricao extends StatefulWidget {
   @override
-  _InicioState createState() => _InicioState();
+  _InscricaoState createState() => _InscricaoState();
 }
 
-class _InicioState extends State<Inicio> {
+class _InscricaoState extends State<Inscricao> {
   @override
   Widget build(BuildContext context) {
-    Api api = Api();
-    api.pesquisar("");
     return Container(
       child: Center(
         child: Text(""
-            "Inicio",
+            "Inscriçõe",
           style: TextStyle(
               fontSize: 25
           ),),

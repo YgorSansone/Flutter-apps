@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:youtube/Api.dart';
-class Inicio extends StatefulWidget {
+class EmAlta extends StatefulWidget {
   @override
-  _InicioState createState() => _InicioState();
+  _EmAltaState createState() => _EmAltaState();
 }
 
-class _InicioState extends State<Inicio> {
+class _EmAltaState extends State<EmAlta> {
   @override
   Widget build(BuildContext context) {
-    Api api = Api();
-    api.pesquisar("");
     return Container(
       child: Center(
         child: Text(""
-            "Inicio",
+            "Em alta",
           style: TextStyle(
               fontSize: 25
           ),),
