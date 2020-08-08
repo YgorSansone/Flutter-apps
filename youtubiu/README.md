@@ -1,6 +1,8 @@
 # youtubiu
 
 A new Flutter application.
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/youtubiu/Screenshot%20from%202020-08-08%2014-51-07.png?raw=true)
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/youtubiu/Screenshot%20from%202020-08-08%2014-51-26.png?raw=true)
 
 ## Getting Started
 
