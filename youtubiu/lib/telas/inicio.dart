@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_youtube/flutter_youtube.dart';
 import 'package:youtubiu/Api.dart';
 import 'package:youtubiu/model/Video.dart';
 class Inicio extends StatefulWidget {
@@ -47,12 +48,12 @@ class _InicioState extends State<Inicio> {
 
                     return GestureDetector(
                       onTap: (){
-//                        FlutterYoutube.playYoutubeVideoById(
-//                            apiKey: CHAVE_YOUTUBE_API,
-//                            videoId: video.id,
-//                            autoPlay: true,
-//                            fullScreen: true
-//                        );
+                        FlutterYoutube.playYoutubeVideoById(
+                            apiKey: CHAVE_YOUTUBE_API,
+                            videoId: video.id,
+                            autoPlay: true,
+                            fullScreen: true
+                        );
                       },
                       child: Column(
                         children: <Widget>[
