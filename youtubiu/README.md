@@ -1,6 +1,9 @@
 # youtubiu
 
 A new Flutter application.
+[![Watch the video](https://github.com/YgorSansone/Flutter-apps/blob/master/youtubiu/Screenshot_1596909123.png?raw=true)](https://github.com/YgorSansone/Flutter-apps/blob/master/youtubiu/video.mp4)
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/youtubiu/Screenshot_1596909123.png?raw=true)
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/youtubiu/Screenshot_1596909130.png?raw=true)
 ![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/youtubiu/Screenshot%20from%202020-08-08%2014-51-07.png?raw=true)
 ![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/youtubiu/Screenshot%20from%202020-08-08%2014-51-26.png?raw=true)
 
