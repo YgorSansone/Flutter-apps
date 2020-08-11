@@ -6,19 +6,66 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  List _listaTarefas = ["Ir ao mercado","Estudar"];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(""),
+        title: Text("Lista de tarefas",style: TextStyle(
+          color: Colors.white,
+        ),),
+        backgroundColor: Colors.purple,
       ),
-      body: Text("a"),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: _listaTarefas.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  title: Text(_listaTarefas[index]),
+                );
+              },
+            ),
+          )
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
+        child: Icon(Icons.add),
           onPressed: (){
-            print("apertou");
+            showDialog(
+                context: context,
+            builder: (context){
+                  return AlertDialog(
+                    title: Text("Adicionar Tarefa"),
+                    content: TextField(
+                      decoration: InputDecoration(
+                        labelText: "Digite sua tarefa",
+                      ),
+                      onChanged: (text){
+
+                      },
+                    ),
+                    actions: [
+                      FlatButton(
+                        child: Text("Cancelar"),
+                        onPressed: (){Navigator.pop((context));},
+                      ),
+                      FlatButton(
+                        child: Text("Salvar"),
+                        onPressed: (){
+
+                          Navigator.pop((context));
+                        },
+                      ),
+                    ],
+                  );
+            });
           }
       ),
-//      bottomNavigationBar: ,
     );
   }
 }
