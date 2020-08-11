@@ -7,6 +7,7 @@ class Photos{
 
   Photos(this._albumId, this._id, this._title, this._url, this._thumbnailUrl);
 
+<<<<<<< HEAD
   Map toJson(){
     return{
       "albumId": _albumId,
@@ -17,6 +18,8 @@ class Photos{
     };
   }
 
+=======
+>>>>>>> c4c3823... Developer
   String get thumbnailUrl => _thumbnailUrl;
 
   set thumbnailUrl(String value) {

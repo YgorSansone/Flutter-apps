@@ -26,6 +26,7 @@ class _HomeState extends State<Home> {
      }
      return postagens;
     }
+<<<<<<< HEAD
 
     Photos  photo = new  Photos(120, null , "Titulo", "https://s3.amazonaws.com/sample-login/companies/avatars/000/000/837/original/Logo-b2w-600x600.png?1520354461", "https://s3.amazonaws.com/sample-login/companies/avatars/000/000/837/original/Logo-b2w-600x600.png?1520354461");
     var corpo = jsonEncode(
@@ -36,6 +37,12 @@ class _HomeState extends State<Home> {
     Future<List<Photos>> _recuperarImagens() async{
       http.Response response = await http.get(_urlBase + "photos");
       var dadosJson = jsonDecode(response.body);
+=======
+    Future<List<Photos>> _recuperarImagens() async{
+      http.Response response = await http.get(_urlBase + "photos");
+      var dadosJson = jsonDecode(response.body);
+      List<Photos> postagensfotos = List();
+>>>>>>> c4c3823... Developer
       for(var photos in dadosJson){
         Photos p = Photos(photos["albumId"], photos["id"], photos["title"], photos["url"], photos["thumbnailUrl"]);
         postagensfotos.add(p);
@@ -43,6 +50,7 @@ class _HomeState extends State<Home> {
       return postagensfotos;
     }
 
+<<<<<<< HEAD
     void printar(response){
       print("Status: ${response.statusCode}");
       if(response.statusCode >= 200 && response.statusCode < 300){
@@ -81,10 +89,13 @@ class _HomeState extends State<Home> {
 
 
 
+=======
+>>>>>>> c4c3823... Developer
     return Scaffold(
       appBar: AppBar(
         title: Text("Consumo de servico avancado"),
       ),
+<<<<<<< HEAD
       body: Container(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -155,6 +166,51 @@ class _HomeState extends State<Home> {
 
           ],
         ),
+=======
+      body: FutureBuilder<List<Photos>>(
+        future: _recuperarImagens(),
+        builder: (context, snapshot){
+          switch( snapshot.connectionState ){
+            case ConnectionState.none :
+              print("None");
+              break;
+            case ConnectionState.waiting :
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+              break;
+            case ConnectionState.active :
+            case ConnectionState.done :
+              print("done");
+              if(snapshot.hasError){
+                print("erro");
+              }else{
+                print("lista");
+                return ListView.builder(
+                  itemCount: snapshot.data.length,
+                    itemBuilder: (context,index){
+                    List<Photos> lista = snapshot.data;
+                    Photos post = lista[index];
+                    return Column(
+                      children: <Widget>[
+                      ListTile(
+                      title: Text(post.title),
+                      subtitle: Text(post.id.toString()),
+                      ),
+                        Image.network(post.url),
+                        Image.network(post.thumbnailUrl),
+                      ],
+                    );
+                    }
+                );
+              }
+              break;
+          }
+          return Center(
+            child: Text(" "),
+          );
+        },
+>>>>>>> c4c3823... Developer
       ),
     );
   }
