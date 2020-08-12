@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -16,9 +17,11 @@ class _HomeState extends State<Home> {
   TextEditingController _controllerTarefa = TextEditingController();
   _salvarTarefa(){
     String textoDigitado = _controllerTarefa.text;
+    DateTime now = DateTime.now();
     Map<String, dynamic> tarefa = Map();
     tarefa["titulo"] = textoDigitado;
     tarefa["realizada"] = false;
+    tarefa['data'] = DateFormat('kk:mm:ss  d/MMM/yyyy').format(now);
     setState(() {
       _listaTarefas.add(tarefa);
     });
@@ -93,8 +96,16 @@ class _HomeState extends State<Home> {
           ),
         ),
         child: CheckboxListTile(
-          title: Text(_listaTarefas[index]['titulo']),
+          title: Text(_listaTarefas[index]['titulo'],
+            style: TextStyle(
+              fontSize: 16,
+//              fontWeight: FontWeight.bold,
+            ),
+          ),
+          checkColor: Colors.white,
+          activeColor: Colors.purple,
           value: _listaTarefas[index]['realizada'],
+          subtitle: Text( _listaTarefas[index]['data']),
           onChanged: (valorAlterado){
             setState(() {
               _listaTarefas[index]['realizada'] = valorAlterado;
