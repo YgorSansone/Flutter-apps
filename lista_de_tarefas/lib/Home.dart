@@ -12,6 +12,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List _listaTarefas = [];
+  Map<String, dynamic> _ultimatarefaremovida = Map();
   TextEditingController _controllerTarefa = TextEditingController();
   _salvarTarefa(){
     String textoDigitado = _controllerTarefa.text;
@@ -43,7 +44,6 @@ class _HomeState extends State<Home> {
       return null;
     }
   }
-  _removerArquivo()async{}
   @override
   void initState() {
     super.initState();
@@ -53,13 +53,30 @@ class _HomeState extends State<Home> {
       });
     });
   }
+
   Widget criarItemLista(context, index){
-    final item = _listaTarefas[index]["titulo"];
+    final item = DateTime.now().millisecondsSinceEpoch.toString();
     return Dismissible(
         key: Key(item),
         direction: DismissDirection.endToStart,
         onDismissed: (direction){
+          _ultimatarefaremovida = _listaTarefas[index];
             _listaTarefas.removeAt(index);
+
+            final snackbar = SnackBar(
+//              backgroundColor: Colors.green,
+              content: Text("Tarefa removida!"),
+              duration: Duration(seconds: 5),
+              action: SnackBarAction(
+                  label: "Desfazer",
+                  onPressed: (){
+                    setState(() {
+                      _listaTarefas.insert(index, _ultimatarefaremovida);
+                    });
+                    _salvarArquivo();
+                  }),
+            );
+            Scaffold.of(context).showSnackBar(snackbar);
           _salvarArquivo();
         },
         background: Container(
@@ -90,12 +107,16 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    print("items: "+ _listaTarefas.toString());
     return Scaffold(
       appBar: AppBar(
-        title: Text("Lista de tarefas",style: TextStyle(
-          color: Colors.white,
-        ),),
+        title: Center(
+          child: Text("Lista de tarefas",
+            style: TextStyle(
+            color: Colors.white,
+          ),
+          ),
+        ),
+
         backgroundColor: Colors.purple,
       ),
       body: Column(
@@ -125,7 +146,6 @@ class _HomeState extends State<Home> {
                         labelText: "Digite sua tarefa",
                       ),
                       onChanged: (text){
-
                       },
                     ),
                     actions: [
