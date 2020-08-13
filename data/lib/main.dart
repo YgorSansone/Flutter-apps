@@ -31,7 +31,7 @@ class _HomeState extends State<Home> {
   _salvar() async{
     Database bd = await _recuperarBancoDeDados();
     Map<String, dynamic> dadosUsuarios ={
-      "nome" : "Ygor",
+      "nome" : "TESTE",
       "idade" : "30"
     };
     int id = await bd.insert("usuarios", dadosUsuarios);
@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
   }
   _listarUsuarios()async {
     Database bd = await _recuperarBancoDeDados();
-    String sql = "SELECT * FROM usuarios WHERE idade = 30";
+    String sql = "SELECT * FROM usuarios";
     List usuarios = await bd.rawQuery(sql);
     for(var usuario in usuarios){
       print(
@@ -50,11 +50,29 @@ class _HomeState extends State<Home> {
     }
     print("Usuarios : "+ usuarios.toString());
   }
+  _recuperarUsuario(int id) async{
+    Database bd = await _recuperarBancoDeDados();
+    List usuarios = await bd.query(
+      "usuarios",
+      columns: ["id","nome", "idade"],
+      where: "id = ?",
+      whereArgs: [id],
+    );
+    for(var usuario in usuarios){
+      print(
+          "id : "+ usuario['id'].toString()+
+              " nome : " + usuario['nome']+
+              " idade : " + usuario['idade'].toString()
+      );
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
     _salvar();
-    _listarUsuarios();
+//    _listarUsuarios();
+  _recuperarUsuario(19);
     return Container();
   }
 }
