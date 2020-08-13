@@ -76,10 +76,26 @@ class _HomeState extends State<Home> {
     );
     print(retorno);
   }
+  _atualizarUsuario(int id) async{
+    Database bd = await _recuperarBancoDeDados();
+    Map<String, dynamic> dadosUsuarios ={
+      "nome" : "teste",
+      "idade" : "31"
+    };
+    int retorno = await bd.update(
+        "usuarios",
+        dadosUsuarios,
+      where: "id = ?",
+      whereArgs:  [id]
+    );
+    print(retorno);
+  }
 
   @override
   Widget build(BuildContext context) {
-    _salvar();
+//    _salvar();
+
+    _atualizarUsuario(22);
     _listarUsuarios();
 //  _excluirUsuario(19);
 //  _recuperarUsuario(19);
