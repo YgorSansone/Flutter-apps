@@ -80,7 +80,7 @@ class _HomeState extends State<Home> {
     Database bd = await _recuperarBancoDeDados();
     Map<String, dynamic> dadosUsuarios ={
       "nome" : "teste",
-      "idade" : "31"
+      "idade" : "1"
     };
     int retorno = await bd.update(
         "usuarios",
