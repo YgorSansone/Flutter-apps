@@ -1,6 +1,10 @@
+import 'dart:ffi';
+
 import 'package:anotacoes/helper/AnotacoesHelper.dart';
 import 'package:anotacoes/model/Anotacao.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,12 +16,22 @@ class _HomeState extends State<Home> {
   TextEditingController _descricaoControler = TextEditingController();
   var _db = AnotacaoHelper();
   List<Anotacao> _anotacoes = List<Anotacao>();
-  _exibirTelaCadastro(){
+  _exibirTelaCadastro({Anotacao anotacao}){
+    String textoSalvarAtualizar = "";
+    if(anotacao == null){
+      _tituloControler.text = "";
+      _descricaoControler.text = "";
+      textoSalvarAtualizar = "Salvar";
+    }else{
+      _tituloControler.text = anotacao.titulo;
+      _descricaoControler.text = anotacao.descricao;
+      textoSalvarAtualizar = "Atualizar";
+    }
     showDialog(
         context: context,
         builder: (context){
           return AlertDialog(
-            title: Text("Adicionar anotacoes"),
+            title: Text("${textoSalvarAtualizar} anotacoes"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -52,14 +66,14 @@ class _HomeState extends State<Home> {
 
             FlatButton(
                 onPressed: (){
-                  _salavarAnotacao();
+                  _salavarAtualizarAnotacao(anotacaoSelecionada: anotacao);
                   Navigator.pop(context);
                 },
                 child: Row(
                   children: [
                   Icon(Icons.done,
                   color: Colors.purple,),
-                    Text("Salvar"),
+                    Text(textoSalvarAtualizar),
                   ],
                   )
             ),
@@ -80,15 +94,29 @@ class _HomeState extends State<Home> {
     });
     listaTemporaria = null;
   }
-  _salavarAnotacao () async{
+  _salavarAtualizarAnotacao ({Anotacao anotacaoSelecionada}) async{
     String titulo = _tituloControler.text;
     String descricao = _descricaoControler.text;
-    Anotacao anotacao = Anotacao(titulo,descricao,DateTime.now().toString());
-    int resultado = await _db.salavarAnotacao(anotacao);
-    print("salvar :" +resultado.toString());
+    if(anotacaoSelecionada == null){
+      Anotacao anotacao = Anotacao(titulo,descricao,DateTime.now().toString());
+      int resultado = await _db.salavarAnotacao(anotacao);
+    }else{
+      anotacaoSelecionada.titulo = titulo;
+      anotacaoSelecionada.descricao = descricao;
+      anotacaoSelecionada.data = DateTime.now().toString();
+      int resultado = await _db.atualizarAnotacao(anotacaoSelecionada);
+    }
     _tituloControler.clear();
     _descricaoControler.clear();
     _recuperarAnotacao();
+  }
+  _formatarData(String data){
+    initializeDateFormatting("pt_BR");
+//    var formatador = DateFormat("d/M/y");
+    var formatador = DateFormat.yMd("pt_BR");
+    DateTime dataConvertida = DateTime.parse(data);
+    String dataFormatada = formatador.format(dataConvertida);
+    return dataFormatada;
   }
   @override
   void initState() {
@@ -106,16 +134,44 @@ class _HomeState extends State<Home> {
         children: [
           Expanded(
               child: ListView.builder(
-                itemCount: _anotacoes.length,
+                  itemCount: _anotacoes.length,
                   itemBuilder: (context, index){
                   final anotacao = _anotacoes[index];
                   return Card(
                     child: ListTile(
                       title: Text(anotacao.titulo),
-                      subtitle: Text("${anotacao.data} - ${anotacao.descricao}"),
+                      subtitle: Text("${_formatarData(anotacao.data)} - ${anotacao.descricao}"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+                              _exibirTelaCadastro(anotacao: anotacao);
+                            },
+                          child: Padding(
+                            padding: EdgeInsets.only(right:16),
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.purple,
+                            ),
+                          ),
+                          ),
+                          GestureDetector(
+                            onTap: (){},
+                            child: Padding(
+                              padding: EdgeInsets.only(right:0),
+                              child: Icon(
+                                Icons.remove_circle_outline,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
-                  })
+                  }
+                  ),
           )
         ],
       ),
