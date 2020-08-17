@@ -12,7 +12,7 @@ class AnotacaoHelper{
   AnotacaoHelper._internal(){
   }  get db async{
     if(_db != null){
-      return db;
+      return _db;
     }else{
       _db = await inicializarDB();
       return _db;
@@ -33,5 +33,12 @@ class AnotacaoHelper{
     var bancoDados = await db;
     int resultado = await bancoDados.insert(nomeTabela, anotacao.toMap());
     return resultado;
+  }
+  recuperarAnotacao() async{
+    var bancoDados = await db;
+    String sql = "SELECT * FROM $nomeTabela ORDER BY data DESC";
+    List anotacoes = await bancoDados.rawQuery(sql);
+    return anotacoes;
+
   }
 }
