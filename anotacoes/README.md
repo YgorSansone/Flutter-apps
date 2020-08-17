@@ -3,6 +3,12 @@
 anotacoes
 
 ## Getting Started
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/anotacoes/Screenshot%20from%202020-08-17%2020-39-06.png)
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/anotacoes/Screenshot%20from%202020-08-17%2020-39-12.png)
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/anotacoes/Screenshot%20from%202020-08-17%2020-39-19.png)
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/anotacoes/Screenshot%20from%202020-08-17%2020-39-23.png)
+![alt text](https://github.com/YgorSansone/Flutter-apps/blob/master/anotacoes/Screenshot%20from%202020-08-17%2020-39-27.png)
+
 
 This project is a starting point for a Flutter application.
 
