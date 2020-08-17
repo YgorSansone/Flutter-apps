@@ -11,6 +11,7 @@ class _HomeState extends State<Home> {
   TextEditingController _tituloControler = TextEditingController();
   TextEditingController _descricaoControler = TextEditingController();
   var _db = AnotacaoHelper();
+  List<Anotacao> _anotacoes = List<Anotacao>();
   _exibirTelaCadastro(){
     showDialog(
         context: context,
@@ -66,12 +67,33 @@ class _HomeState extends State<Home> {
          );
     });
   }
+  _recuperarAnotacao() async{
+    _anotacoes.clear();
+    List anotacoesRecuperadas = await _db.recuperarAnotacao();
+    List<Anotacao> listaTemporaria = List<Anotacao>();
+    for(var item in anotacoesRecuperadas){
+      Anotacao anotacao = Anotacao.fromMap(item);
+      listaTemporaria.add(anotacao);
+    }
+    setState(() {
+      _anotacoes = listaTemporaria;
+    });
+    listaTemporaria = null;
+  }
   _salavarAnotacao () async{
     String titulo = _tituloControler.text;
     String descricao = _descricaoControler.text;
     Anotacao anotacao = Anotacao(titulo,descricao,DateTime.now().toString());
     int resultado = await _db.salavarAnotacao(anotacao);
     print("salvar :" +resultado.toString());
+    _tituloControler.clear();
+    _descricaoControler.clear();
+    _recuperarAnotacao();
+  }
+  @override
+  void initState() {
+    _recuperarAnotacao();
+    super.initState();
   }
   @override
   Widget build(BuildContext context) {
@@ -80,7 +102,22 @@ class _HomeState extends State<Home> {
         title: Text("Minhas anotacoes"),
         backgroundColor: Colors.deepPurple,
       ),
-      body: Container(
+      body: Column(
+        children: [
+          Expanded(
+              child: ListView.builder(
+                itemCount: _anotacoes.length,
+                  itemBuilder: (context, index){
+                  final anotacao = _anotacoes[index];
+                  return Card(
+                    child: ListTile(
+                      title: Text(anotacao.titulo),
+                      subtitle: Text("${anotacao.data} - ${anotacao.descricao}"),
+                    ),
+                  );
+                  })
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.deepPurple,
