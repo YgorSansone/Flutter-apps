@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:frasesdodia/telas/dia.dart';
 void main(){
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -16,69 +16,115 @@ class HomeStatefull extends StatefulWidget {
 }
 
 class _HomeStatefullState extends State<HomeStatefull> {
-  var _frases = ["Gratidao", "Ola", "Teste","boa"];
-  var _frasegerada = "Clique abaixo para gerar uma frase!";
-  void _gerarFrase(){
-    var numero = Random().nextInt(_frases.length);
-    setState(() {
-      _frasegerada = _frases[numero];
-    });
 
-  }
+
+  String _resposta = "";
+  int _indiceAtual = 0;
 //  int randomNumber = random.nextInt(frases.length);
+  List<Widget> telas = [
+    Dia(),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Frases do dia"),
-        backgroundColor: Colors.lightGreen,
+        title: Image.asset(
+          "images/amor.png",
+          width: 98,
+          height: 70,
+        ),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(
+          color: Colors.grey,
+          opacity: 1,
+        ),
+//        actions: <Widget>[
+//          IconButton(
+//            icon:Icon(Icons.cast),
+//            onPressed: (){
+//              print("acao: cast");
+//            },
+//          ),
+//          IconButton(
+//            icon:Icon(Icons.videocam),
+//            onPressed: (){
+//              print("acao: videocam");
+//            },
+//          ),
+//          IconButton(
+//            icon: Icon(Icons.search),
+//            onPressed: () async{
+////              String res = await showSearch(context: context, delegate: CustomSearchDelegate());
+//              setState(() {
+////                _resposta = res;
+//              });
+//            },
+//
+//          ),
+//          IconButton(
+//            icon: Icon(Icons.account_circle),
+//            onPressed: (){
+//              print("acao: conta");
+//            },
+//          ),
+//        ],
       ),
-        body:Center(
-          child: Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-//                border: Border.all(width: 3,color: Colors.green),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Image.asset("images/logo.png",
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  Text(_frasegerada,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(20),
-                    child: RaisedButton(
-                        color: Colors.lightGreen,
-                        child: Text("Nova frase",
-                          style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onPressed: () {
-                          _gerarFrase();
-                        }
-                    ),
-                  ),
-                ],
-              )
+      body: Container(
+        padding: EdgeInsets.all(16),
+        child: telas[_indiceAtual],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _indiceAtual,
+        type: BottomNavigationBarType.fixed,
+        fixedColor: Colors.red,
+        onTap: (indice){
+          setState(() {
+            _indiceAtual = indice;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+            title: Text("Mensagens"),
+            icon: Icon(Icons.favorite),
           ),
-        )
+          BottomNavigationBarItem(
+            title: Text("Tempo"),
+            icon: Icon(Icons.access_time),
+          ),
+          BottomNavigationBarItem(
+            title: Text("Especial"),
+            icon: Icon(Icons.cake),
+          ),
+
+        ],
+      ),
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

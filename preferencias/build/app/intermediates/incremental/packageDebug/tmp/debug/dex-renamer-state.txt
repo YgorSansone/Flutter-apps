@@ -1,0 +1,4 @@
+#Mon Aug 10 21:54:54 BRT 2020
+base.0=/home/caioissa/AndroidStudioProjects/Hello_world/preferencias/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
