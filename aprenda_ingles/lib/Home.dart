@@ -2,6 +2,7 @@ import 'package:aprenda_ingles/telas/bichos.dart';
 import 'package:aprenda_ingles/telas/numeros.dart';
 import 'package:aprenda_ingles/telas/vogais.dart';
 import 'package:flutter/material.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -28,8 +29,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Aprenda Ingles",style:TextStyle(
-        ),),
+        title: Center(
+          child: Text("Aprenda Ingles",style:TextStyle(
+          ),),
+        ),
 //        toolbarHeight: 500,
         bottom: TabBar(
           indicatorWeight: 4,
