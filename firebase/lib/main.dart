@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 void main()  async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +31,7 @@ void main()  async {
 //  );
 
 //  print("Item salvo : " + ref.documentID);
-  Firestore db = Firestore.instance;
+
 //  db.collection("usuarios").document("003").delete();
 
 //  DocumentSnapshot snapshot = await db.collection("usuarios").document("002").get();
@@ -42,21 +43,42 @@ void main()  async {
 //  for(DocumentSnapshot item in querySnapshot.documents){
 //    print("dados usuarios: " + item.data.toString());
 //  }
-  db.collection("usuarios").snapshots().listen(
-      (snapshot){
-          for(DocumentSnapshot item in snapshot.documents){
-          print("dados usuarios: " + item.data.toString());
-        }
-        
-      }
-  );
+
+  //PRINTAR PELO LISTEN
+//  db.collection("usuarios").snapshots().listen(
+//      (snapshot){
+//          for(DocumentSnapshot item in snapshot.documents){
+//          print("dados usuarios: " + item.data.toString());
+//        }
+//
+//      }
+//  );
+
+  Firestore db = Firestore.instance;
+  QuerySnapshot querySnapshot = await db.collection("usuarios")
+//      .where("Nome", isEqualTo: "ygor")
+  .where("idade", isGreaterThan: 15)
+//  .where("idade", isLessThan: 50)
+  .orderBy("idade", descending: true)
+//  .orderBy("Nome", descending: false)
+  .limit(2)
+      .getDocuments();
+  
+  for(DocumentSnapshot item in querySnapshot.documents){
+    var dados = item.data;
+    print("filtro : "+ dados["Nome"] +" _ "+ dados["idade"].toString());
+  }
 
   runApp(
       App()
   );
 }
+class App extends StatefulWidget {
+  @override
+  _AppState createState() => _AppState();
+}
 
-class App extends StatelessWidget {
+class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return Container();
