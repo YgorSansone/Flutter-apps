@@ -54,16 +54,20 @@ void main()  async {
 //      }
 //  );
 
+
+  var pesquisa = "Mar";
   Firestore db = Firestore.instance;
   QuerySnapshot querySnapshot = await db.collection("usuarios")
 //      .where("Nome", isEqualTo: "ygor")
-  .where("idade", isGreaterThan: 15)
+//  .where("idade", isGreaterThan: 15)
 //  .where("idade", isLessThan: 50)
-  .orderBy("idade", descending: true)
+//  .orderBy("idade", descending: true)
 //  .orderBy("Nome", descending: false)
-  .limit(2)
+  //  .limit(2)
+  .where("Nome", isGreaterThanOrEqualTo: pesquisa)
+  .where("Nome", isLessThanOrEqualTo: pesquisa + "\uf8ff")
       .getDocuments();
-  
+
   for(DocumentSnapshot item in querySnapshot.documents){
     var dados = item.data;
     print("filtro : "+ dados["Nome"] +" _ "+ dados["idade"].toString());
