@@ -122,6 +122,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   File _imagem;
+  String _statusUpload = "Upload nao iniciado";
+  String _imagemrecuperada ="";
   Future _recuperarImagem(bool daCamera) async{
     File imagemSelecionada;
     if(daCamera){
@@ -141,8 +143,30 @@ class _HomeState extends State<Home> {
     StorageReference arquivo = pastaRaiz
         .child("fotos")
         .child("foto1.jpg");
+    //Progresso do upload
+    StorageUploadTask task = arquivo.putFile(_imagem);
+    //controlar progresso de upload
+    task.events.listen((StorageTaskEvent storageEvent) {
+      if(storageEvent.type == StorageTaskEventType.progress){
+        setState(() {
+          _statusUpload = "Em progresso";
 
-    arquivo.putFile(_imagem);
+        });
+      }else if(storageEvent.type == StorageTaskEventType.success){
+        _statusUpload = "sucesso";
+        _imagem = null;
+      }
+    });
+    task.onComplete.then((StorageTaskSnapshot snapshot){
+      _recuperarURLImagem(snapshot);
+    });
+  }
+  Future _recuperarURLImagem(StorageTaskSnapshot snapshot)async{
+    String url = await snapshot.ref.getDownloadURL();
+    print("resultado url : "+ url);
+    setState(() {
+      _imagemrecuperada = url;
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -152,6 +176,7 @@ class _HomeState extends State<Home> {
       ),body: SingleChildScrollView(
       child:     Column(
           children: [
+            Text(_statusUpload),
       RaisedButton(
       child: Text("Camera"),
         onPressed: (){
@@ -168,12 +193,17 @@ class _HomeState extends State<Home> {
           ?Container()
           :
       Image.file(_imagem),
-            RaisedButton(
+            _imagem ==null
+                ? Container()
+                : RaisedButton(
                 child: Text("Upload storage"),
                 onPressed: (){
                   _uploadImagem();
                 }
             ),
+            _imagemrecuperada ==null
+                ?Container()
+                : Image.network(_imagemrecuperada),
       ],
     ),
     )
