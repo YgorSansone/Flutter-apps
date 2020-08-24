@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 void main()  async {
-  WidgetsFlutterBinding.ensureInitialized();
+//  WidgetsFlutterBinding.ensureInitialized();
 //    db.collection("usuarios")
 //  .document("001")
 //  .setData(
@@ -72,9 +76,9 @@ void main()  async {
 //  }
 
   ////////////////////////////////////////////////////////////////////
-  FirebaseAuth auth = FirebaseAuth.instance;
-  String email = "ygorsansone@gmail.com";
-  String senha = "123456";
+//  FirebaseAuth auth = FirebaseAuth.instance;
+//  String email = "ygorsansone@gmail.com";
+//  String senha = "123456";
 
   //CADASTRO
 //  auth.createUserWithEmailAndPassword(
@@ -85,27 +89,125 @@ void main()  async {
 //  }).catchError((erro){
 //    print("ERRO : " +erro.toString());
 //    });
+  //DESLOGANDO
+//  auth.signOut();
+  //LOGANDO
+//  auth.signInWithEmailAndPassword(
+//      email: email,
+//      password: senha)
+//      .then((firebaseUser){
+//    print("Logar: email: " +firebaseUser.email);
+//  }).catchError((erro){
+//    print("ERRO : " +erro.toString());
+//    });
 
-  FirebaseUser usuarioAtual = await auth.currentUser();
-  if(usuarioAtual != null){
-    print("logado : " +usuarioAtual.email);
-  }else{
-    print("deslogado");
-  }
+//  FirebaseUser usuarioAtual = await auth.currentUser();
+//  if(usuarioAtual != null){
+//    print("logado : " +usuarioAtual.email);
+//  }else{
+//    print("deslogado");
+//  }
+  
+  
+  //IMAGENS
   
   runApp(
-      App()
+      MaterialApp(home: Home(),)
   );
 }
-class App extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
-  _AppState createState() => _AppState();
+  _HomeState createState() => _HomeState();
 }
 
-class _AppState extends State<App> {
+class _HomeState extends State<Home> {
+  File _imagem;
+  String _statusUpload = "Upload nao iniciado";
+  String _imagemrecuperada ="";
+  Future _recuperarImagem(bool daCamera) async{
+    File imagemSelecionada;
+    if(daCamera){
+      // ignore: deprecated_member_use
+      imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.camera);
+    }else{
+      // ignore: deprecated_member_use
+      imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.gallery);
+    }
+    setState(() {
+      _imagem = imagemSelecionada;
+    });
+  }
+  Future _uploadImagem() async{
+    FirebaseStorage storage = FirebaseStorage.instance;
+    StorageReference pastaRaiz = storage.ref();
+    StorageReference arquivo = pastaRaiz
+        .child("fotos")
+        .child("foto1.jpg");
+    //Progresso do upload
+    StorageUploadTask task = arquivo.putFile(_imagem);
+    //controlar progresso de upload
+    task.events.listen((StorageTaskEvent storageEvent) {
+      if(storageEvent.type == StorageTaskEventType.progress){
+        setState(() {
+          _statusUpload = "Em progresso";
+
+        });
+      }else if(storageEvent.type == StorageTaskEventType.success){
+        _statusUpload = "sucesso";
+        _imagem = null;
+      }
+    });
+    task.onComplete.then((StorageTaskSnapshot snapshot){
+      _recuperarURLImagem(snapshot);
+    });
+  }
+  Future _recuperarURLImagem(StorageTaskSnapshot snapshot)async{
+    String url = await snapshot.ref.getDownloadURL();
+    print("resultado url : "+ url);
+    setState(() {
+      _imagemrecuperada = url;
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Selecionar imagem"),
+      ),body: SingleChildScrollView(
+      child:     Column(
+          children: [
+            Text(_statusUpload),
+      RaisedButton(
+      child: Text("Camera"),
+        onPressed: (){
+          _recuperarImagem(true);
+        }
+    ),
+      RaisedButton(
+          child: Text("Galeria"),
+          onPressed: (){
+            _recuperarImagem(false);
+          }
+      ),
+      _imagem ==null
+          ?Container()
+          :
+      Image.file(_imagem),
+            _imagem ==null
+                ? Container()
+                : RaisedButton(
+                child: Text("Upload storage"),
+                onPressed: (){
+                  _uploadImagem();
+                }
+            ),
+            _imagemrecuperada ==null
+                ?Container()
+                : Image.network(_imagemrecuperada),
+      ],
+    ),
+    )
+    );
   }
 }
 
