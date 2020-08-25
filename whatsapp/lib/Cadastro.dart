@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:whatsapp/Home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'RouteGenerator.dart';
 import 'model/Usuario.dart';
 class Cadastro extends StatefulWidget {
   @override
@@ -23,10 +24,7 @@ class _CadastroState extends State<Cadastro> {
           db.collection("usuarios")
           .document(firebaseUser.uid)
           .setData(usuario.toMap());
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(
-            builder: (context) => Home(),
-          ));
+          Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.ROTA_HOME,(_)=>false);
     }).catchError((error){
       setState(() {
         _mensagemerro ="Erro ao cadastrar";

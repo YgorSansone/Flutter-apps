@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/Cadastro.dart';
+import 'package:whatsapp/RouteGenerator.dart';
 
 import 'Home.dart';
 import 'model/Usuario.dart';
@@ -21,10 +22,7 @@ class _LoginState extends State<Login> {
         email: usuario.email,
         password: usuario.senha)
         .then((firebaseUser) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(
-        builder: (context) => Home(),
-      ));
+      Navigator.pushReplacementNamed(context, RouteGenerator.ROTA_HOME);
     }).catchError((error){
       setState(() {
         _mensagemerro ="Erro ao verificar usuario!";
@@ -62,10 +60,7 @@ class _LoginState extends State<Login> {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseUser usuarioLogado = await auth.currentUser();
     if(usuarioLogado != null){
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(
-        builder: (context) => Home(),
-      ));
+      Navigator.pushReplacementNamed(context, RouteGenerator.ROTA_HOME);
     }
     }
     @override
@@ -147,8 +142,7 @@ class _LoginState extends State<Login> {
                       style: TextStyle(color: Colors.white),
                     ),
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Cadastro()));
+                      Navigator.pushNamed(context, RouteGenerator.ROTA_CADASTRO);
                     },
                   ),
                 ),
