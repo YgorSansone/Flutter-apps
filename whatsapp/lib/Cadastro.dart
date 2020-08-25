@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:whatsapp/Home.dart';
 
+import 'model/Usuario.dart';
 class Cadastro extends StatefulWidget {
   @override
   _CadastroState createState() => _CadastroState();
@@ -10,8 +13,20 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
   String _mensagemerro ="";
-  _cadastrarUsuario(){
-
+  _cadastrarUsuario(Usuario usuario){
+    FirebaseAuth auth= FirebaseAuth.instance;
+    auth.createUserWithEmailAndPassword(
+        email: usuario.email, password: usuario.senha)
+        .then((firebaseUser) {
+          Navigator.push(
+              context, MaterialPageRoute(
+            builder: (context) => Home(),
+          ));
+    }).catchError((error){
+      setState(() {
+        _mensagemerro ="Erro ao cadastrar";
+      });
+    });
   }
   _validarCampos(){
     String nome = _controllerNome.text;
@@ -19,15 +34,19 @@ class _CadastroState extends State<Cadastro> {
     String senha = _controllerSenha.text;
     if(nome.isNotEmpty && nome.length >3){
       if(email.isNotEmpty && email.contains("@")){
-        if(senha.isNotEmpty && senha.length >1){
+        if(senha.isNotEmpty && senha.length >6){
           setState(() {
             _mensagemerro = "";
           });
-          _cadastrarUsuario();
+          Usuario usuario = Usuario();
+          usuario.nome = nome;
+          usuario.email = email;
+          usuario.senha = senha;
+          _cadastrarUsuario(usuario);
         }
         else{
           setState(() {
-            _mensagemerro = "Preencha a senha!";
+            _mensagemerro = "Preencha a senha (Mais de 6 caracteres)!";
           });
 
         }
@@ -134,7 +153,8 @@ class _CadastroState extends State<Cadastro> {
                   child: Text(
                     _mensagemerro,
                     style: TextStyle(
-                      color: Colors.red,
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
                   ),
