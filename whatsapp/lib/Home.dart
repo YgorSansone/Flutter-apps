@@ -5,7 +5,8 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
+  TabController _tabController;
   String _emailUsuario = "";
   Future _recuperarDados()async{
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -18,6 +19,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     _recuperarDados();
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+    );
     super.initState();
   }
   @override
@@ -25,9 +30,33 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text("WhatsApp"),
+        bottom: TabBar(
+          indicatorWeight: 4,
+            labelStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold
+            ),
+            controller: _tabController,
+            indicatorColor: Colors.white,
+            tabs: [
+              Tab(text: "CONVERSAS" ,),
+              Tab(text: "STATUS" ,),
+              Tab(text: "CHAMADAS" ,),
+            ]
+        ),
       ),
-      body: Container(
-        child: Text("Email :${_emailUsuario}"),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          Text("CONVERSAS"),
+          Text("Status"),
+          Text("Contatos"),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){},
+        child: Icon(Icons.message,color: Colors.white,),
+        backgroundColor: Colors.greenAccent,
       ),
     );
   }
