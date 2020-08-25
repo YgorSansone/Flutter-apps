@@ -18,7 +18,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
   _escolhaMenuItem(String itemEscolhido){
     switch(itemEscolhido){
       case "Configurações":
-        print("Configurações");
+        Navigator.pushNamed(context, RouteGenerator.ROTA_CONFI);
         break;
       case "Deslogar" :
         _deslogarUsuario();
