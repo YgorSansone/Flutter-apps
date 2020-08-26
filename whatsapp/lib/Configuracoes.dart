@@ -1,5 +1,8 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +14,11 @@ class Configuracoes extends StatefulWidget {
 class _ConfiguracoesState extends State<Configuracoes> {
   TextEditingController _controllerNome = TextEditingController();
   File _imagem;
+  String _idUsuarioLogado;
+  String _imagemRecuperada;
   File imagemSelecionada;
+  String _nomeusuario;
+  bool _subindoImagem = false;
   Future _recuperarImagem(bool daCamera)async{
     if(daCamera){
       // ignore: deprecated_member_use
@@ -23,7 +30,91 @@ class _ConfiguracoesState extends State<Configuracoes> {
     }
     setState(() {
       _imagem = imagemSelecionada;
+      if(_imagem != null){
+        _subindoImagem = true;
+        _uploadImagem();
+      }
     });
+  }
+  Future _uploadImagem()async{
+    FirebaseStorage storage = FirebaseStorage.instance;
+    StorageReference pastaRaiz = storage.ref();
+    StorageReference arquivo = pastaRaiz
+    .child("perfil")
+    .child("${_idUsuarioLogado}.jpg");
+    StorageUploadTask task = arquivo.putFile(_imagem);
+    task.events.listen((StorageTaskEvent storageEvent){
+      if(storageEvent.type == StorageTaskEventType.progress){
+        setState(() {
+          _subindoImagem = true;
+        });
+      }else if(storageEvent.type == StorageTaskEventType.success){
+        setState(() {
+          _subindoImagem = false;
+        });
+      }
+      task.onComplete.then((StorageTaskSnapshot snapshot){
+        _recuparUrlImagem(snapshot);
+      });
+    });
+  }
+  Future _recuparUrlImagem(StorageTaskSnapshot snapshot)async{
+    String url = await snapshot.ref.getDownloadURL();
+    _atualizarUrlImagemFiresStore(url);
+    setState(() {
+      _imagemRecuperada = url;
+    });
+  }
+
+  Future _atualizarUrlImagemFiresStore(String url) async{
+    Firestore db = Firestore.instance;
+    Map<String, dynamic> dadosAtualizar ={"urlImagem" : url};
+    db.collection("usuarios")
+    .document(_idUsuarioLogado)
+    .updateData(dadosAtualizar);
+  }
+  Future _atualizarNomeFiresStore(bool doBotao, {String texto}) async{
+    var nome;
+    if(doBotao){
+      nome = _controllerNome.text;
+    }else{
+      nome = texto;
+    }
+    Firestore db = Firestore.instance;
+    Map<String, dynamic> dadosAtualizar ={"nome" : nome};
+    db.collection("usuarios")
+        .document(_idUsuarioLogado)
+        .updateData(dadosAtualizar);
+  }
+
+  Future _recuperarDados()async{
+    FirebaseAuth auth = FirebaseAuth.instance;
+    Firestore db = Firestore.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    setState(() {
+      _idUsuarioLogado = usuarioLogado.uid;
+    });
+    DocumentSnapshot snapshot = await
+    db.collection("usuarios")
+        .document( _idUsuarioLogado )
+        .get();
+    Map<String, dynamic> dados = snapshot.data;
+    setState(() {
+      _controllerNome.text = dados["nome"];
+    });
+    if(dados["urlImagem"] != null){
+      setState(() {
+        _imagemRecuperada = dados["urlImagem"];
+      });
+
+    }
+//    auth.signOut();
+  }
+  @override
+  @override
+  void initState() {
+    _recuperarDados();
+    super.initState();
   }
   @override
   Widget build(BuildContext context) {
@@ -37,14 +128,22 @@ class _ConfiguracoesState extends State<Configuracoes> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                //carregando
+                Container(
+                  padding: EdgeInsets.all(16),
+                  child:_subindoImagem
+                      ?
+                  CircularProgressIndicator()
+                      :
+                  Container(),
+                ),
                 CircleAvatar(
                   radius: 100,
                   backgroundColor: Colors.grey,
                   backgroundImage:
-                  NetworkImage(
-                      "https://firebasestorage.googleapis.com/v0/b/whatsapp-465f3.appspot.com/o/perfil%2Fperfil5.jpg?alt=media&token=81ed04c2-e1b4-4e1d-8094-d53ba0238789"
-                  ),
+                      _imagemRecuperada != null
+                          ?
+                          NetworkImage(_imagemRecuperada)
+                      : null
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -69,6 +168,9 @@ class _ConfiguracoesState extends State<Configuracoes> {
                     autofocus: true,
                     controller: _controllerNome,
                     keyboardType: TextInputType.text,
+                    onChanged: (texto){
+                      _atualizarNomeFiresStore(false,texto: texto);
+                    },
                     style: TextStyle(fontSize: 20),
                     decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
@@ -91,7 +193,7 @@ class _ConfiguracoesState extends State<Configuracoes> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32)),
                     onPressed: () {
-//                      _validarCampos();
+                      _atualizarNomeFiresStore(true);
                     },
                   ),
                 ),
