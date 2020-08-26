@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:whatsapp/telas/AbaConversas.dart';
 import 'package:whatsapp/telas/AbaStatus.dart';
 
@@ -37,8 +38,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
     });
 //    auth.signOut();
   }
+  Future _verificarUsuarioLogado() async{
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    if(usuarioLogado != null){
+      // Navigator.pushReplacementNamed(context, RouteGenerator.ROTA_HOME);
+    }
+  }
   @override
   void initState() {
+    _verificarUsuarioLogado();
     _recuperarDados();
     _tabController = TabController(
       length: 4,
@@ -63,12 +72,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
             ),
             controller: _tabController,
             indicatorColor: Colors.white,
-
+            isScrollable: true,
             tabs: [
               Tab(icon: Icon(Icons.camera_alt, textDirection: TextDirection.ltr,)),
-              Tab(text: "CHATS",),
+              Tab(text: "CONVERSAS",),
               Tab(text: "STATUS" ,),
-              Tab(text: "CALLS" ,),
+              Tab(text: "CHAMADAS" ,),
             ]
         ),
         actions: <Widget>[
