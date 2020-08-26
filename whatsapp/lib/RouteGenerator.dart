@@ -3,7 +3,6 @@ import 'package:whatsapp/Cadastro.dart';
 import 'package:whatsapp/Configuracoes.dart';
 import 'package:whatsapp/Login.dart';
 import 'package:whatsapp/Mensagens.dart';
-import 'package:whatsapp/model/Usuario.dart';
 import 'package:whatsapp/telas/AbaContatos.dart';
 
 import 'Home.dart';

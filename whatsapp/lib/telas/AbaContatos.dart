@@ -1,11 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/model/Conversa.dart';
-import '../model/Usuario.dart';
-// import '../Login.dart';
+
 import '../RouteGenerator.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../model/Usuario.dart';
 
 class AbaContatos extends StatefulWidget {
   @override

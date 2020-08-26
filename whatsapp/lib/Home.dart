@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsapp/Login.dart';
-import 'package:whatsapp/telas/AbaContatos.dart';
 import 'package:whatsapp/telas/AbaConversas.dart';
 import 'package:whatsapp/telas/AbaStatus.dart';
 
@@ -67,7 +65,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
             indicatorColor: Colors.white,
 
             tabs: [
-              Tab(icon: Icon(Icons.camera_alt)),
+              Tab(icon: Icon(Icons.camera_alt, textDirection: TextDirection.ltr,)),
               Tab(text: "CHATS",),
               Tab(text: "STATUS" ,),
               Tab(text: "CALLS" ,),
