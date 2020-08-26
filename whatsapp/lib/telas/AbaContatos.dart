@@ -125,6 +125,13 @@ class _AbaContatosState extends State<AbaContatos> {
                         List<Usuario> listaitens = snapshot.data;
                         Usuario usuario = listaitens[indice];
                         return ListTile(
+                          onTap: (){
+                            Navigator.pushNamed(
+                              context,
+                              RouteGenerator.ROTA_MSG,
+                              arguments: usuario
+                            );
+                          } ,
                           contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                           leading: CircleAvatar(
                             maxRadius: 30,
