@@ -1,8 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/Login.dart';
 
-import 'Home.dart';
 import 'RouteGenerator.dart';
 
 void main() {
