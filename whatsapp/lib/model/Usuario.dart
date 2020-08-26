@@ -1,9 +1,15 @@
 class Usuario{
   String _nome;
   String _email;
+  String _url;
   String _senha;
-
   Usuario();
+
+  String get senha => _senha;
+
+  set senha(String value) {
+    _senha = value;
+  }
 
   Map<String, dynamic> toMap(){
     Map<String, dynamic> map = {
@@ -12,10 +18,11 @@ class Usuario{
     };
     return map;
   }
-  String get senha => _senha;
 
-  set senha(String value) {
-    _senha = value;
+  String get url => _url;
+
+  set url(String value) {
+    _url = value;
   }
 
   String get email => _email;
