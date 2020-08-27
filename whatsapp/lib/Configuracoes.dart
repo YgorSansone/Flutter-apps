@@ -26,7 +26,6 @@ class _ConfiguracoesState extends State<Configuracoes> {
     }else{
       // ignore: deprecated_member_use
       imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.camera);
-
     }
     setState(() {
       _imagem = imagemSelecionada;
