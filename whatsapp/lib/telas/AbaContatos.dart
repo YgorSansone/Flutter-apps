@@ -58,6 +58,7 @@ class _AbaContatosState extends State<AbaContatos> {
         usuario.email = dados["email"];
         usuario.nome = dados["nome"];
         usuario.url = dados["urlImagem"];
+        usuario.idUsuario = item.documentID;
         listaUsuario.add(usuario);
       }
     }
