@@ -1,8 +1,16 @@
 class Usuario{
+  String _idUsuario;
   String _nome;
   String _email;
   String _url;
   String _senha;
+
+  String get idUsuario => _idUsuario;
+
+  set idUsuario(String value) {
+    _idUsuario = value;
+  }
+
   Usuario();
 
   String get senha => _senha;
