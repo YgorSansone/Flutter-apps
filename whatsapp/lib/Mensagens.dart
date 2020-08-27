@@ -1,5 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/model/Mensagem.dart';
@@ -27,7 +30,7 @@ class _MensagensState extends State<Mensagens> {
     if (textoMensagem.isNotEmpty) {
       Mensagem msg = Mensagem();
       msg.idUsuario = _idUsuarioLogado;
-      msg.mensagem = textoMensagem;
+      msg.mensagem = utf8.encode(textoMensagem).toString();
       msg.url = "";
       msg.tipo = "texto";
       _salvarMensagem(_idUsuarioLogado, _idUsuarioDestinatario, msg);
@@ -143,7 +146,7 @@ class _MensagensState extends State<Mensagens> {
               autofocus: true,
               decoration: InputDecoration(
                   contentPadding: EdgeInsets.fromLTRB(32, 8, 32, 8),
-                  hintText: "Senha",
+                  hintText: "Digite uma mensagem",
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
