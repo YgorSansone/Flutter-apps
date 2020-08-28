@@ -8,6 +8,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
+import 'model/Conversa.dart';
+
 class Mensagens extends StatefulWidget {
   Usuario contato;
   Mensagens(this.contato);
@@ -17,7 +19,6 @@ class Mensagens extends StatefulWidget {
 
 class _MensagensState extends State<Mensagens> {
   String _idUsuarioLogado;
-  File _imagem;
   bool _subindoImagem = false;
   Firestore db = Firestore.instance;
   String _idUsuarioDestinatario;
@@ -32,9 +33,28 @@ class _MensagensState extends State<Mensagens> {
       msg.tipo = "texto";
       _salvarMensagem(_idUsuarioLogado, _idUsuarioDestinatario, msg);
       _salvarMensagem(_idUsuarioDestinatario, _idUsuarioLogado, msg);
+      //salvar conversa
+      _salvarConversa(msg);
     }
   }
-
+_salvarConversa(Mensagem mensagem){
+    Conversa cRemetente = Conversa();
+    cRemetente.idRemetente = _idUsuarioLogado;
+    cRemetente.idDestinatario = _idUsuarioDestinatario;
+    cRemetente.mensagem = mensagem.mensagem;
+    cRemetente.nome = widget.contato.nome;
+    cRemetente.caminhoFoto = widget.contato.url;
+    cRemetente.tipoMensagem = mensagem.tipo;
+    cRemetente.salvar();
+    Conversa cDestinatario = Conversa();
+    cDestinatario.idRemetente = _idUsuarioDestinatario;
+    cDestinatario.idDestinatario = _idUsuarioLogado;
+    cDestinatario.nome = widget.contato.nome;
+    cDestinatario.caminhoFoto = widget.contato.url;
+    cDestinatario.mensagem = mensagem.mensagem;
+    cDestinatario.tipoMensagem = mensagem.tipo;
+    cDestinatario.salvar();
+}
   _salvarMensagem(
       String idRemetente, String idDestinatario, Mensagem msg) async {
     await db
@@ -138,7 +158,7 @@ class _MensagensState extends State<Mensagens> {
           case ConnectionState.done:
             QuerySnapshot querySnapshot = snapshot.data;
             if (snapshot.hasError) {
-              return Expanded(child: Text("Erro ao carregar as mensagens"));
+              return  Text("Erro ao carregar as mensagens");
             } else {
               return Expanded(
                 child: ListView.builder(
@@ -207,7 +227,11 @@ class _MensagensState extends State<Mensagens> {
               ),
             ),
           ),
-          FloatingActionButton(
+          Platform.isIOS
+              ? CupertinoButton(
+              child: Text("Enviar"),
+              onPressed: _enviarMensagem)
+              : FloatingActionButton(
             backgroundColor: Color(0xff075E54),
             child: Icon(
               Icons.send,
