@@ -158,7 +158,7 @@ _salvarConversa(Mensagem mensagem){
           case ConnectionState.done:
             QuerySnapshot querySnapshot = snapshot.data;
             if (snapshot.hasError) {
-              return Expanded(child: Text("Erro ao carregar as mensagens"));
+              return  Text("Erro ao carregar as mensagens");
             } else {
               return Expanded(
                 child: ListView.builder(
