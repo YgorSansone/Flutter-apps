@@ -227,7 +227,11 @@ _salvarConversa(Mensagem mensagem){
               ),
             ),
           ),
-          FloatingActionButton(
+          Platform.isIOS
+              ? CupertinoButton(
+              child: Text("Enviar"),
+              onPressed: _enviarMensagem)
+              : FloatingActionButton(
             backgroundColor: Color(0xff075E54),
             child: Icon(
               Icons.send,

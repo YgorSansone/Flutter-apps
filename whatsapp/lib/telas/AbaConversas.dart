@@ -5,7 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/model/Conversa.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:whatsapp/model/Usuario.dart';
 import 'dart:async';
+
+import '../RouteGenerator.dart';
 class AbaConversas extends StatefulWidget {
   @override
   _AbaConversasState createState() => _AbaConversasState();
@@ -90,7 +93,19 @@ class _AbaConversasState extends State<AbaConversas> {
                   String tipo = item["tipoMensagem"];
                   String menagem = item["mensagem"];
                   String nome = item["nome"];
+                  String idDestinatario = item["idDestinatario"];
+                  Usuario usuario = Usuario();
+                  usuario.nome = nome;
+                  usuario.url = urlImagem;
+                  usuario.idUsuario = idDestinatario;
                   return ListTile(
+                    onTap: (){
+                      Navigator.pushNamed(
+                          context,
+                          RouteGenerator.ROTA_MSG,
+                          arguments: usuario
+                      );
+                    } ,
                     contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                     leading: CircleAvatar(
                       maxRadius: 30,
