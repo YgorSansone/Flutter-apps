@@ -265,8 +265,9 @@ _salvarConversa(Mensagem mensagem){
                         icon: Icon(Icons.attach_file), onPressed: _enviarFoto),
               ),
             ),
-          ),
-          Platform.isIOS
+          ),_controllerMensagem.text != ""
+          ?
+              Platform.isIOS
               ? CupertinoButton(
               child: Text("Enviar"),
               onPressed: _enviarMensagem)
@@ -278,6 +279,15 @@ _salvarConversa(Mensagem mensagem){
             ),
             mini: true,
             onPressed: _enviarMensagem,
+          )
+          : FloatingActionButton(
+            backgroundColor: Color(0xff075E54),
+            child: Icon(
+              Icons.mic,
+              color: Colors.white,
+            ),
+            mini: true,
+            onPressed: (){},
           ),
         ],
       ),
@@ -299,6 +309,24 @@ _salvarConversa(Mensagem mensagem){
             Text(widget.contato.nome),
           ],
         ),
+        actions: <Widget>[
+          Icon(Icons.videocam),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          ),
+          Icon(Icons.phone),
+          PopupMenuButton<String>(
+            onSelected: _escolhaMenuItem,
+            itemBuilder: (context){
+              return itensMenu.map((String item) {
+                return PopupMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
