@@ -2,8 +2,13 @@ class Mensagem{
   String _idUsuario;
   String _mensagem;
   String _url;
+  String _data;
 
-  //texto ou imagem
+  String get data => _data;
+
+  set data(String value) {
+    _data = value;
+  } //texto ou imagem
   String _tipo;
 
   Mensagem();
@@ -13,6 +18,7 @@ class Mensagem{
       "mensagem" : this.mensagem,
       "url" : this.url,
       "tipo" : this.tipo,
+      "data" : this.data,
     };
     return map;
   }
