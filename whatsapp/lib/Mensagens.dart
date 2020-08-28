@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp/RouteGenerator.dart';
 import 'package:whatsapp/model/Mensagem.dart';
 import 'package:whatsapp/model/Usuario.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -20,6 +21,24 @@ class Mensagens extends StatefulWidget {
 }
 
 class _MensagensState extends State<Mensagens> {
+  List<String> itensMenu =[
+    "Configurações", "Deslogar"
+  ];
+  _escolhaMenuItem(String itemEscolhido){
+    switch(itemEscolhido){
+      case "Configurações":
+        Navigator.pushNamed(context, RouteGenerator.ROTA_CONFI);
+        break;
+      case "Deslogar" :
+        _deslogarUsuario();
+        break;
+    }
+  }
+  _deslogarUsuario()async{
+    FirebaseAuth auth = FirebaseAuth.instance;
+    await auth.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.ROTA_LOGIN,(_)=>false);
+  }
   String _idUsuarioLogado;
   bool _subindoImagem = false;
   Firestore db = Firestore.instance;
@@ -35,6 +54,7 @@ class _MensagensState extends State<Mensagens> {
       msg.mensagem = textoMensagem;
       msg.url = "";
       msg.tipo = "texto";
+      msg.data = Timestamp.now().toString();
       _salvarMensagem(_idUsuarioLogado, _idUsuarioDestinatario, msg);
       _salvarMensagem(_idUsuarioDestinatario, _idUsuarioLogado, msg);
       //salvar conversa
@@ -49,14 +69,16 @@ _salvarConversa(Mensagem mensagem){
     cRemetente.nome = widget.contato.nome;
     cRemetente.caminhoFoto = widget.contato.url;
     cRemetente.tipoMensagem = mensagem.tipo;
+    cRemetente.data = mensagem.data;
     cRemetente.salvar();
     Conversa cDestinatario = Conversa();
     cDestinatario.idRemetente = _idUsuarioDestinatario;
     cDestinatario.idDestinatario = _idUsuarioLogado;
+    cDestinatario.mensagem = mensagem.mensagem;
     cDestinatario.nome = widget.contato.nome;
     cDestinatario.caminhoFoto = widget.contato.url;
-    cDestinatario.mensagem = mensagem.mensagem;
     cDestinatario.tipoMensagem = mensagem.tipo;
+    cDestinatario.data = mensagem.data;
     cDestinatario.salvar();
 }
   _salvarMensagem(
@@ -113,12 +135,13 @@ _salvarConversa(Mensagem mensagem){
     mensagem.mensagem = "";
     mensagem.url = url;
     mensagem.tipo = "imagem";
-
+    mensagem.data = Timestamp.now().toString();
     //Salvar mensagem para remetente
     _salvarMensagem(_idUsuarioLogado, _idUsuarioDestinatario, mensagem);
 
     //Salvar mensagem para o destinatário
     _salvarMensagem(_idUsuarioDestinatario, _idUsuarioLogado, mensagem);
+    _salvarConversa(mensagem);
   }
 
   Future _recuperarDados() async {
@@ -136,12 +159,13 @@ _salvarConversa(Mensagem mensagem){
         .collection("mensagens")
         .document(_idUsuarioLogado)
         .collection(_idUsuarioDestinatario)
+        .orderBy("data",descending: false)
         .snapshots();
-    stream.listen((dados) {
-      _controller.add(dados);
-      Timer(Duration(seconds: 1),(){
+    stream.listen((dados){
+      _controller.add( dados );
+      Timer(Duration(seconds: 1), (){
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      });
+      } );
     });
   }
 
