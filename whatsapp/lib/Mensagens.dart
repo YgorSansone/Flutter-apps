@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,6 +25,8 @@ class _MensagensState extends State<Mensagens> {
   Firestore db = Firestore.instance;
   String _idUsuarioDestinatario;
   TextEditingController _controllerMensagem = TextEditingController();
+  ScrollController _scrollController = ScrollController();
+  final _controller = StreamController<QuerySnapshot>.broadcast();
   _enviarMensagem() {
     String textoMensagem = _controllerMensagem.text;
     if (textoMensagem.isNotEmpty) {
@@ -124,7 +128,21 @@ _salvarConversa(Mensagem mensagem){
       _idUsuarioLogado = usuarioLogado.uid;
       _idUsuarioDestinatario = widget.contato.idUsuario;
     });
+    _adicionarListenerMensagem();
 //    auth.signOut();
+  }
+  Stream<QuerySnapshot>_adicionarListenerMensagem(){
+    final stream = db
+        .collection("mensagens")
+        .document(_idUsuarioLogado)
+        .collection(_idUsuarioDestinatario)
+        .snapshots();
+    stream.listen((dados) {
+      _controller.add(dados);
+      Timer(Duration(seconds: 1),(){
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      });
+    });
   }
 
   @override
@@ -136,11 +154,7 @@ _salvarConversa(Mensagem mensagem){
   @override
   Widget build(BuildContext context) {
     var stram = StreamBuilder(
-      stream: db
-          .collection("mensagens")
-          .document(_idUsuarioLogado)
-          .collection(_idUsuarioDestinatario)
-          .snapshots(),
+      stream: _controller.stream,
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -162,6 +176,7 @@ _salvarConversa(Mensagem mensagem){
             } else {
               return Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
                     itemCount: querySnapshot.documents.length,
                     itemBuilder: (context, indice) {
                       List<DocumentSnapshot> mensagens =
