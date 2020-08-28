@@ -34,18 +34,7 @@ class _AbaContatosState extends State<AbaContatos> {
         context, RouteGenerator.ROTA_LOGIN, (_) => false);
   }
 
-  List<Conversa> listaConversas = [
-    Conversa(
-        "Jose Renato",
-        "Ola tudo bem?????????????????????????????????????????????????????????????????????????",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-465f3.appspot.com/o/perfil%2Fperfil5.jpg?alt=media&token=81ed04c2-e1b4-4e1d-8094-d53ba0238789"),
-    Conversa("Jose Renato", "Ola tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-465f3.appspot.com/o/perfil%2Fperfil4.jpg?alt=media&token=d1f7a6e8-5f93-4bba-90c8-2756e6e6afa8"),
-    Conversa("Jose Renato", "Ola tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-465f3.appspot.com/o/perfil%2Fperfil5.jpg?alt=media&token=81ed04c2-e1b4-4e1d-8094-d53ba0238789"),
-    Conversa("Jose Renato", "Ola tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-465f3.appspot.com/o/perfil%2Fperfil4.jpg?alt=media&token=d1f7a6e8-5f93-4bba-90c8-2756e6e6afa8"),
-  ];
+  List<Conversa> listaConversas;
   Future<List<Usuario>> _recuperarContatos() async {
     Firestore db = Firestore.instance;
     QuerySnapshot querySnapshot =
