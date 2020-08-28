@@ -7,6 +7,7 @@ class Conversa{
   String _idRemetente;
   String _idDestinatario;
   String _tipoMensagem; //texto ou imagem
+  String _data;
   String get nome => _nome;
 
   Map<String, dynamic> toMap(){
@@ -17,8 +18,15 @@ class Conversa{
       "mensagem"        : this.mensagem,
       "caminhoFoto"     : this.caminhoFoto,
       "tipoMensagem"    : this.tipoMensagem,
+      "data"            : this.data,
     };
     return map;
+  }
+
+  String get data => _data;
+
+  set data(String value) {
+    _data = value;
   }
 
   Conversa();
