@@ -13,8 +13,7 @@ class AbaConversas extends StatefulWidget {
 }
 
 class _AbaConversasState extends State<AbaConversas> {
-
-  List<Conversa> _listaConversas = List();
+  
   final _controller = StreamController<QuerySnapshot>.broadcast();
   Firestore db = Firestore.instance;
   String _idUsuarioLogado;
@@ -23,13 +22,6 @@ class _AbaConversasState extends State<AbaConversas> {
   void initState() {
     super.initState();
     _recuperarDadosUsuario();
-
-    Conversa conversa = Conversa();
-    conversa.nome = "Ana Clara";
-    conversa.mensagem = "Olá tudo bem?";
-    conversa.caminhoFoto = "https://firebasestorage.googleapis.com/v0/b/whatsapp-36cd8.appspot.com/o/perfil%2Fperfil1.jpg?alt=media&token=97a6dbed-2ede-4d14-909f-9fe95df60e30";
-
-    _listaConversas.add(conversa);
 
   }
 
