@@ -265,9 +265,7 @@ _salvarConversa(Mensagem mensagem){
                         icon: Icon(Icons.attach_file), onPressed: _enviarFoto),
               ),
             ),
-          ),_controllerMensagem.text != ""
-          ?
-              Platform.isIOS
+          ),Platform.isIOS
               ? CupertinoButton(
               child: Text("Enviar"),
               onPressed: _enviarMensagem)
@@ -280,15 +278,6 @@ _salvarConversa(Mensagem mensagem){
             mini: true,
             onPressed: _enviarMensagem,
           )
-          : FloatingActionButton(
-            backgroundColor: Color(0xff075E54),
-            child: Icon(
-              Icons.mic,
-              color: Colors.white,
-            ),
-            mini: true,
-            onPressed: (){},
-          ),
         ],
       ),
     );
