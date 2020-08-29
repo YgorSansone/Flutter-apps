@@ -113,7 +113,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
           Navigator.pushNamed(context, RouteGenerator.ROTA_CONTATO);
         },
         child: Icon(Icons.insert_comment,color: Colors.white,),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Colors.green,
       ),
     );
   }
