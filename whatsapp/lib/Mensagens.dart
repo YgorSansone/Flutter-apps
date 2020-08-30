@@ -21,24 +21,25 @@ class Mensagens extends StatefulWidget {
 }
 
 class _MensagensState extends State<Mensagens> {
-  List<String> itensMenu =[
-    "Configurações", "Deslogar"
-  ];
-  _escolhaMenuItem(String itemEscolhido){
-    switch(itemEscolhido){
+  List<String> itensMenu = ["Configurações", "Deslogar"];
+  _escolhaMenuItem(String itemEscolhido) {
+    switch (itemEscolhido) {
       case "Configurações":
         Navigator.pushNamed(context, RouteGenerator.ROTA_CONFI);
         break;
-      case "Deslogar" :
+      case "Deslogar":
         _deslogarUsuario();
         break;
     }
   }
-  _deslogarUsuario()async{
+
+  _deslogarUsuario() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     await auth.signOut();
-    Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.ROTA_LOGIN,(_)=>false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, RouteGenerator.ROTA_LOGIN, (_) => false);
   }
+
   String _idUsuarioLogado;
   bool _subindoImagem = false;
   Firestore db = Firestore.instance;
@@ -61,7 +62,8 @@ class _MensagensState extends State<Mensagens> {
       _salvarConversa(msg);
     }
   }
-_salvarConversa(Mensagem mensagem){
+
+  _salvarConversa(Mensagem mensagem) {
     Conversa cRemetente = Conversa();
     cRemetente.idRemetente = _idUsuarioLogado;
     cRemetente.idDestinatario = _idUsuarioDestinatario;
@@ -80,7 +82,8 @@ _salvarConversa(Mensagem mensagem){
     cDestinatario.tipoMensagem = mensagem.tipo;
     cDestinatario.data = mensagem.data;
     cDestinatario.salvar();
-}
+  }
+
   _salvarMensagem(
       String idRemetente, String idDestinatario, Mensagem msg) async {
     await db
@@ -94,7 +97,7 @@ _salvarConversa(Mensagem mensagem){
   _enviarFoto() async {
     File imagemSelecionada;
     imagemSelecionada =
-    await ImagePicker.pickImage(source: ImageSource.gallery);
+        await ImagePicker.pickImage(source: ImageSource.gallery);
 
     _subindoImagem = true;
     String nomeImagem = DateTime.now().millisecondsSinceEpoch.toString();
@@ -154,18 +157,19 @@ _salvarConversa(Mensagem mensagem){
     _adicionarListenerMensagem();
 //    auth.signOut();
   }
-  Stream<QuerySnapshot>_adicionarListenerMensagem(){
+
+  Stream<QuerySnapshot> _adicionarListenerMensagem() {
     final stream = db
         .collection("mensagens")
         .document(_idUsuarioLogado)
         .collection(_idUsuarioDestinatario)
-        .orderBy("data",descending: false)
+        .orderBy("data", descending: false)
         .snapshots();
-    stream.listen((dados){
-      _controller.add( dados );
-      Timer(Duration(seconds: 1), (){
+    stream.listen((dados) {
+      _controller.add(dados);
+      Timer(Duration(seconds: 1), () {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      } );
+      });
     });
   }
 
@@ -196,11 +200,11 @@ _salvarConversa(Mensagem mensagem){
           case ConnectionState.done:
             QuerySnapshot querySnapshot = snapshot.data;
             if (snapshot.hasError) {
-              return  Text("Erro ao carregar as mensagens");
+              return Text("Erro ao carregar as mensagens");
             } else {
               return Expanded(
                 child: ListView.builder(
-                  controller: _scrollController,
+                    controller: _scrollController,
                     itemCount: querySnapshot.documents.length,
                     itemBuilder: (context, indice) {
                       List<DocumentSnapshot> mensagens =
@@ -265,19 +269,19 @@ _salvarConversa(Mensagem mensagem){
                         icon: Icon(Icons.attach_file), onPressed: _enviarFoto),
               ),
             ),
-          ),Platform.isIOS
+          ),
+          Platform.isIOS
               ? CupertinoButton(
-              child: Text("Enviar"),
-              onPressed: _enviarMensagem)
+                  child: Text("Enviar"), onPressed: _enviarMensagem)
               : FloatingActionButton(
-            backgroundColor: Color(0xff075E54),
-            child: Icon(
-              Icons.send,
-              color: Colors.white,
-            ),
-            mini: true,
-            onPressed: _enviarMensagem,
-          )
+                  backgroundColor: Color(0xff075E54),
+                  child: Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
+                  mini: true,
+                  onPressed: _enviarMensagem,
+                )
         ],
       ),
     );
@@ -306,7 +310,7 @@ _salvarConversa(Mensagem mensagem){
           Icon(Icons.phone),
           PopupMenuButton<String>(
             onSelected: _escolhaMenuItem,
-            itemBuilder: (context){
+            itemBuilder: (context) {
               return itensMenu.map((String item) {
                 return PopupMenuItem<String>(
                   value: item,

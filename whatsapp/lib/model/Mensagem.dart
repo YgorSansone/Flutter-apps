@@ -1,4 +1,4 @@
-class Mensagem{
+class Mensagem {
   String _idUsuario;
   String _mensagem;
   String _url;
@@ -9,16 +9,17 @@ class Mensagem{
   set data(String value) {
     _data = value;
   } //texto ou imagem
+
   String _tipo;
 
   Mensagem();
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
-      "idUsuario" : this.idUsuario,
-      "mensagem" : this.mensagem,
-      "url" : this.url,
-      "tipo" : this.tipo,
-      "data" : this.data,
+      "idUsuario": this.idUsuario,
+      "mensagem": this.mensagem,
+      "url": this.url,
+      "tipo": this.tipo,
+      "data": this.data,
     };
     return map;
   }

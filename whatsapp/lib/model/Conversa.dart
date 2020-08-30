@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-class Conversa{
+
+class Conversa {
   String _nome;
   String _mensagem;
   String _caminhoFoto;
@@ -10,15 +11,15 @@ class Conversa{
   String _data;
   String get nome => _nome;
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
-      "idRemetente"     : this.idRemetente,
-      "idDestinatario"  : this.idDestinatario,
-      "nome"            : this.nome,
-      "mensagem"        : this.mensagem,
-      "caminhoFoto"     : this.caminhoFoto,
-      "tipoMensagem"    : this.tipoMensagem,
-      "data"            : this.data,
+      "idRemetente": this.idRemetente,
+      "idDestinatario": this.idDestinatario,
+      "nome": this.nome,
+      "mensagem": this.mensagem,
+      "caminhoFoto": this.caminhoFoto,
+      "tipoMensagem": this.tipoMensagem,
+      "data": this.data,
     };
     return map;
   }
@@ -30,15 +31,15 @@ class Conversa{
   }
 
   Conversa();
-  salvar()async{
+  salvar() async {
     Firestore db = Firestore.instance;
-    await db.collection("conversas")
-    .document(this.idRemetente)
-    .collection("ultima_conversa")
-    .document(this.idDestinatario)
-    .setData(this.toMap());
+    await db
+        .collection("conversas")
+        .document(this.idRemetente)
+        .collection("ultima_conversa")
+        .document(this.idDestinatario)
+        .setData(this.toMap());
   }
-
 
   String get idRemetente => _idRemetente;
 

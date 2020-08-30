@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'RouteGenerator.dart';
 import 'model/Usuario.dart';
+
 class Cadastro extends StatefulWidget {
   @override
   _CadastroState createState() => _CadastroState();
@@ -13,30 +14,34 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
-  String _mensagemerro ="";
-  _cadastrarUsuario(Usuario usuario){
-    FirebaseAuth auth= FirebaseAuth.instance;
-    auth.createUserWithEmailAndPassword(
-        email: usuario.email, password: usuario.senha)
+  String _mensagemerro = "";
+  _cadastrarUsuario(Usuario usuario) {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    auth
+        .createUserWithEmailAndPassword(
+            email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-          Firestore db = Firestore.instance;
-          db.collection("usuarios")
+      Firestore db = Firestore.instance;
+      db
+          .collection("usuarios")
           .document(firebaseUser.uid)
           .setData(usuario.toMap());
-          Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.ROTA_HOME,(_)=>false);
-    }).catchError((error){
+      Navigator.pushNamedAndRemoveUntil(
+          context, RouteGenerator.ROTA_HOME, (_) => false);
+    }).catchError((error) {
       setState(() {
-        _mensagemerro ="Erro ao cadastrar";
+        _mensagemerro = "Erro ao cadastrar";
       });
     });
   }
-  _validarCampos(){
+
+  _validarCampos() {
     String nome = _controllerNome.text;
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
-    if(nome.isNotEmpty && nome.length >3){
-      if(email.isNotEmpty && email.contains("@")){
-        if(senha.isNotEmpty && senha.length >6){
+    if (nome.isNotEmpty && nome.length > 3) {
+      if (email.isNotEmpty && email.contains("@")) {
+        if (senha.isNotEmpty && senha.length > 6) {
           setState(() {
             _mensagemerro = "";
           });
@@ -45,27 +50,23 @@ class _CadastroState extends State<Cadastro> {
           usuario.email = email;
           usuario.senha = senha;
           _cadastrarUsuario(usuario);
-        }
-        else{
+        } else {
           setState(() {
             _mensagemerro = "Preencha a senha (Mais de 6 caracteres)!";
           });
-
         }
-      }
-      else{
+      } else {
         setState(() {
           _mensagemerro = "Preencha o email(utilizando @)!";
         });
-
       }
-    }
-    else{
+    } else {
       setState(() {
         _mensagemerro = "Preencha o nome(Com mais de 3 caracteres)!";
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,7 +162,6 @@ class _CadastroState extends State<Cadastro> {
                     ),
                   ),
                 )
-
               ],
             ),
           ),
