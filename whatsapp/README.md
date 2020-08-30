@@ -1,7 +1,7 @@
-# whatsapp
+# WhatsApp
 
-A new Flutter application.
-
+Flutter application (WhatsApp Clone with FireBase)
+[![Watch the video](https://i.imgur.com/91S3ro0.jpg)](https://streamable.com/o7llo7)
 ## Getting Started
 
 This project is a starting point for a Flutter application.
