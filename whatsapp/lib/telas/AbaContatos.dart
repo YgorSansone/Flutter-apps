@@ -42,7 +42,7 @@ class _AbaContatosState extends State<AbaContatos> {
     List<Usuario> listaUsuario = List();
     for (DocumentSnapshot item in querySnapshot.documents) {
       var dados = item.data;
-      if(dados["email"] != _email_user_logado){
+      if (dados["email"] != _email_user_logado) {
         Usuario usuario = Usuario();
         usuario.email = dados["email"];
         usuario.nome = dados["nome"];
@@ -54,7 +54,7 @@ class _AbaContatosState extends State<AbaContatos> {
     return listaUsuario;
   }
 
-  Future _recuperarDados()async{
+  Future _recuperarDados() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseUser usuarioLogado = await auth.currentUser();
     setState(() {
@@ -63,11 +63,13 @@ class _AbaContatosState extends State<AbaContatos> {
     });
 //    auth.signOut();
   }
-@override
+
+  @override
   void initState() {
     _recuperarDados();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,22 +117,18 @@ class _AbaContatosState extends State<AbaContatos> {
                         List<Usuario> listaitens = snapshot.data;
                         Usuario usuario = listaitens[indice];
                         return ListTile(
-                          onTap: (){
+                          onTap: () {
                             Navigator.pushNamed(
-                              context,
-                              RouteGenerator.ROTA_MSG,
-                              arguments: usuario
-                            );
-                          } ,
+                                context, RouteGenerator.ROTA_MSG,
+                                arguments: usuario);
+                          },
                           contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                           leading: CircleAvatar(
-                            maxRadius: 30,
-                            backgroundColor: Colors.grey,
-                            backgroundImage: usuario.url != null
-                                ?
-                            NetworkImage(usuario.url)
-                                : null
-                          ),
+                              maxRadius: 30,
+                              backgroundColor: Colors.grey,
+                              backgroundImage: usuario.url != null
+                                  ? NetworkImage(usuario.url)
+                                  : null),
                           title: Text(
                             usuario.nome,
                             style: TextStyle(
