@@ -48,40 +48,51 @@ class _MensagensState extends State<Mensagens> {
   ScrollController _scrollController = ScrollController();
   final _controller = StreamController<QuerySnapshot>.broadcast();
   _enviarMensagem() {
+
     String textoMensagem = _controllerMensagem.text;
     if (textoMensagem.isNotEmpty) {
-      Mensagem msg = Mensagem();
-      msg.idUsuario = _idUsuarioLogado;
-      msg.mensagem = textoMensagem;
-      msg.url = "";
-      msg.tipo = "texto";
-      msg.data = Timestamp.now().toString();
-      _salvarMensagem(_idUsuarioLogado, _idUsuarioDestinatario, msg);
-      _salvarMensagem(_idUsuarioDestinatario, _idUsuarioLogado, msg);
-      //salvar conversa
-      _salvarConversa(msg);
+      Mensagem mensagem = Mensagem();
+      mensagem.idUsuario = _idUsuarioLogado;
+      mensagem.mensagem = textoMensagem;
+      mensagem.url = "";
+      mensagem.tipo = "texto";
+      mensagem.data = Timestamp.now().toString();
+
+      //Salvar mensagem para remetente
+      _salvarMensagem(_idUsuarioLogado, _idUsuarioDestinatario, mensagem);
+
+      //Salvar mensagem para o destinatário
+      _salvarMensagem(_idUsuarioDestinatario, _idUsuarioLogado, mensagem);
+
+      //Salvar conversa
+      _salvarConversa( mensagem );
+
+
     }
   }
 
-  _salvarConversa(Mensagem mensagem) {
+  _salvarConversa(Mensagem msg){
+
+    //Salvar conversa remetente
     Conversa cRemetente = Conversa();
     cRemetente.idRemetente = _idUsuarioLogado;
     cRemetente.idDestinatario = _idUsuarioDestinatario;
-    cRemetente.mensagem = mensagem.mensagem;
+    cRemetente.mensagem = msg.mensagem;
     cRemetente.nome = widget.contato.nome;
     cRemetente.caminhoFoto = widget.contato.url;
-    cRemetente.tipoMensagem = mensagem.tipo;
-    cRemetente.data = mensagem.data;
+    cRemetente.tipoMensagem = msg.tipo;
     cRemetente.salvar();
+
+    //Salvar conversa destinatario
     Conversa cDestinatario = Conversa();
     cDestinatario.idRemetente = _idUsuarioDestinatario;
     cDestinatario.idDestinatario = _idUsuarioLogado;
-    cDestinatario.mensagem = mensagem.mensagem;
+    cDestinatario.mensagem = msg.mensagem;
     cDestinatario.nome = widget.contato.nome;
     cDestinatario.caminhoFoto = widget.contato.url;
-    cDestinatario.tipoMensagem = mensagem.tipo;
-    cDestinatario.data = mensagem.data;
+    cDestinatario.tipoMensagem = msg.tipo;
     cDestinatario.salvar();
+
   }
 
   _salvarMensagem(
@@ -91,13 +102,16 @@ class _MensagensState extends State<Mensagens> {
         .document(idRemetente)
         .collection(idDestinatario)
         .add(msg.toMap());
+
+    //Limpa texto
     _controllerMensagem.clear();
+
   }
 
   _enviarFoto() async {
+
     File imagemSelecionada;
-    imagemSelecionada =
-        await ImagePicker.pickImage(source: ImageSource.gallery);
+    imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     _subindoImagem = true;
     String nomeImagem = DateTime.now().millisecondsSinceEpoch.toString();
@@ -105,32 +119,36 @@ class _MensagensState extends State<Mensagens> {
     StorageReference pastaRaiz = storage.ref();
     StorageReference arquivo = pastaRaiz
         .child("mensagens")
-        .child(_idUsuarioLogado)
-        .child(nomeImagem + ".jpg");
+        .child( _idUsuarioLogado )
+        .child( nomeImagem + ".jpg");
 
     //Upload da imagem
-    StorageUploadTask task = arquivo.putFile(imagemSelecionada);
+    StorageUploadTask task = arquivo.putFile( imagemSelecionada );
 
     //Controlar progresso do upload
-    task.events.listen((StorageTaskEvent storageEvent) {
-      if (storageEvent.type == StorageTaskEventType.progress) {
+    task.events.listen((StorageTaskEvent storageEvent){
+
+      if( storageEvent.type == StorageTaskEventType.progress ){
         setState(() {
           _subindoImagem = true;
         });
-      } else if (storageEvent.type == StorageTaskEventType.success) {
+      }else if( storageEvent.type == StorageTaskEventType.success ){
         setState(() {
           _subindoImagem = false;
         });
       }
+
     });
 
     //Recuperar url da imagem
-    task.onComplete.then((StorageTaskSnapshot snapshot) {
+    task.onComplete.then((StorageTaskSnapshot snapshot){
       _recuperarUrlImagem(snapshot);
     });
+
   }
 
   Future _recuperarUrlImagem(StorageTaskSnapshot snapshot) async {
+
     String url = await snapshot.ref.getDownloadURL();
 
     Mensagem mensagem = Mensagem();
@@ -139,44 +157,46 @@ class _MensagensState extends State<Mensagens> {
     mensagem.url = url;
     mensagem.tipo = "imagem";
     mensagem.data = Timestamp.now().toString();
+
     //Salvar mensagem para remetente
     _salvarMensagem(_idUsuarioLogado, _idUsuarioDestinatario, mensagem);
 
     //Salvar mensagem para o destinatário
     _salvarMensagem(_idUsuarioDestinatario, _idUsuarioLogado, mensagem);
-    _salvarConversa(mensagem);
+
   }
 
   Future _recuperarDados() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseUser usuarioLogado = await auth.currentUser();
-    setState(() {
-      _idUsuarioLogado = usuarioLogado.uid;
-      _idUsuarioDestinatario = widget.contato.idUsuario;
-    });
-    _adicionarListenerMensagem();
+    _idUsuarioLogado = usuarioLogado.uid;
+    _idUsuarioDestinatario = widget.contato.idUsuario;
+
+    _adicionarListenerMensagens();
 //    auth.signOut();
   }
 
-  Stream<QuerySnapshot> _adicionarListenerMensagem() {
-    final stream = db
-        .collection("mensagens")
+  Stream<QuerySnapshot> _adicionarListenerMensagens(){
+
+    final stream = db.collection("mensagens")
         .document(_idUsuarioLogado)
         .collection(_idUsuarioDestinatario)
         .orderBy("data", descending: false)
         .snapshots();
-    stream.listen((dados) {
-      _controller.add(dados);
-      Timer(Duration(seconds: 1), () {
+
+    stream.listen((dados){
+      _controller.add( dados );
+      Timer(Duration(seconds: 1), (){
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      });
+      } );
     });
+
   }
 
   @override
   void initState() {
-    _recuperarDados();
     super.initState();
+    _recuperarDados();
   }
 
   @override
@@ -214,7 +234,7 @@ class _MensagensState extends State<Mensagens> {
                           (MediaQuery.of(context).size.width * 0.8);
                       Alignment alinhamento = Alignment.centerRight;
                       Color cor = Color(0xffd2ffa5);
-                      if (_idUsuarioLogado != item["idUsuario"]) {
+                      if ( _idUsuarioLogado != item["idUsuario"] ) {
                         alinhamento = Alignment.centerLeft;
                         cor = Colors.white;
                       }

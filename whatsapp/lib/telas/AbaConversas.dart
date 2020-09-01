@@ -22,24 +22,28 @@ class _AbaConversasState extends State<AbaConversas> {
     _recuperarDadosUsuario();
   }
 
-  Stream<QuerySnapshot> _adicionarListenerConversas() {
-    final stream = db
-        .collection("conversas")
-        .document(_idUsuarioLogado)
+  Stream<QuerySnapshot> _adicionarListenerConversas(){
+
+    final stream = db.collection("conversas")
+        .document( _idUsuarioLogado )
         .collection("ultima_conversa")
         .snapshots();
 
-    stream.listen((dados) {
-      _controller.add(dados);
+    stream.listen((dados){
+      _controller.add( dados );
     });
+
   }
 
   _recuperarDadosUsuario() async {
+
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseUser usuarioLogado = await auth.currentUser();
     _idUsuarioLogado = usuarioLogado.uid;
 
     _adicionarListenerConversas();
+
+
   }
 
   @override
@@ -82,19 +86,19 @@ class _AbaConversasState extends State<AbaConversas> {
                     ),
                   );
                 }
-                List<DocumentSnapshot> conversas =
-                    querySnapshot.documents.toList();
+                List<DocumentSnapshot> conversas = querySnapshot.documents.toList();
 
                 return ListView.builder(
                     itemCount: conversas.length,
                     itemBuilder: (context, indice) {
-                      // List<DocumentSnapshot> conversas = querySnapshot.documents.toList();
+
                       DocumentSnapshot item = conversas[indice];
-                      String urlImagem = item["caminhoFoto"];
-                      String tipo = item["tipoMensagem"];
-                      String mensagem = item["mensagem"];
-                      String nome = item["nome"];
-                      String idDestinatario = item["idDestinatario"];
+                      // List<DocumentSnapshot> conversas = querySnapshot.documents.toList();
+                      String urlImagem  = item["caminhoFoto"];
+                      String tipo       = item["tipoMensagem"];
+                      String mensagem   = item["mensagem"];
+                      String nome       = item["nome"];
+                      String idDestinatario       = item["idDestinatario"];
 
                       Usuario usuario = Usuario();
                       usuario.nome = nome;
