@@ -11,6 +11,7 @@ class _HomeState extends State<Home> {
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _marcadores = {};
   Set<Polygon> _polygons = {};
+  Set<Polyline> _polylines = {};
   _onMapCreated(GoogleMapController googleMapController){
     _controller.complete(googleMapController);
   }
@@ -58,12 +59,37 @@ class _HomeState extends State<Home> {
     // setState(() {
     //   _marcadores = _marcadorLocal;
     // });
-    Set<Polygon> listaPolygons ={};
-    Polygon polygon1 = Polygon(
-      polygonId: PolygonId("polygon1"),
-      fillColor: Colors.transparent,
-      strokeColor: Colors.green,
-      strokeWidth: 10,
+
+    //POLYGON
+    // Set<Polygon> listaPolygons ={};
+    // Polygon polygon1 = Polygon(
+    //   polygonId: PolygonId("polygon1"),
+    //   fillColor: Colors.transparent,
+    //   strokeColor: Colors.green,
+    //   strokeWidth: 10,
+    //   points: [
+    //     LatLng(-23.561816, -46.652044),
+    //     LatLng(-23.563625, -46.653642),
+    //     LatLng(-23.564786, -46.652226),
+    //     LatLng(-23.563085, -46.650531),
+    //   ],
+    //   consumeTapEvents: true,
+    //   onTap: (){
+    //     print("aqui !");
+    //   },
+    // );
+    // listaPolygons.add(polygon1);
+    // setState(() {
+    //   _polygons = listaPolygons;
+    // });
+
+    //POLYLINES
+    Set<Polyline> listaPolylines ={};
+    Polyline polyline1 = Polyline(
+      polylineId: PolylineId("polygon1"),
+      color: Colors.red,
+      width: 15,
+      startCap: Cap.roundCap,
       points: [
         LatLng(-23.561816, -46.652044),
         LatLng(-23.563625, -46.653642),
@@ -75,9 +101,9 @@ class _HomeState extends State<Home> {
         print("aqui !");
       },
     );
-    listaPolygons.add(polygon1);
+    listaPolylines.add(polyline1);
     setState(() {
-      _polygons = listaPolygons;
+      _polylines = listaPolylines;
     });
 }
   @override
@@ -104,6 +130,7 @@ class _HomeState extends State<Home> {
           onMapCreated: _onMapCreated,
           markers: _marcadores,
           polygons: _polygons,
+          polylines: _polylines,
         ),
       ),
     );
