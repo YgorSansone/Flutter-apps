@@ -9,6 +9,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Completer<GoogleMapController> _controller = Completer();
+  Set<Marker> _marcadores = {};
   _onMapCreated(GoogleMapController googleMapController){
     _controller.complete(googleMapController);
   }
@@ -17,13 +18,50 @@ class _HomeState extends State<Home> {
     googleMapController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
-          target: LatLng(-23.962436, -46.655005),
+          target: LatLng(-23.563370, -46.652923),
             zoom: 19,
           tilt: 45,
           bearing: 270
         )
       )
     );
+  }
+  _carregarMarcadores(){
+    Set<Marker> _marcadorLocal = {};
+    Marker marcadorShop = Marker(
+      markerId: MarkerId("marcador shopping"),
+      position: LatLng(-23.563370, -46.652923),
+      infoWindow: InfoWindow(
+        title: "Shopping"
+      ),
+      icon: BitmapDescriptor.defaultMarkerWithHue(
+        BitmapDescriptor.hueMagenta
+      ),
+    );
+    Marker marcadorCartorio = Marker(
+      markerId: MarkerId("marcador cartorio"),
+      position: LatLng(-23.562868, -46.655874),
+        infoWindow: InfoWindow(
+            title: "Cartorio"
+        ),
+      icon: BitmapDescriptor.defaultMarkerWithHue(
+          BitmapDescriptor.hueYellow
+      ),
+      // rotation: 45
+      onTap: (){
+        print("cartorio");
+      }
+    );
+    _marcadorLocal.add((marcadorShop));
+    _marcadorLocal.add((marcadorCartorio));
+    setState(() {
+      _marcadores = _marcadorLocal;
+    });
+}
+  @override
+  void initState() {
+    _carregarMarcadores();
+    super.initState();
   }
   @override
   Widget build(BuildContext context) {
@@ -42,6 +80,7 @@ class _HomeState extends State<Home> {
             zoom: 16
           ),
           onMapCreated: _onMapCreated,
+          markers: _marcadores,
         ),
       ),
     );
