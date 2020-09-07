@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:geolocator/geolocator.dart';
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -12,23 +12,21 @@ class _HomeState extends State<Home> {
   Set<Marker> _marcadores = {};
   Set<Polygon> _polygons = {};
   Set<Polyline> _polylines = {};
-  _onMapCreated(GoogleMapController googleMapController){
+  _onMapCreated(GoogleMapController googleMapController) {
     _controller.complete(googleMapController);
   }
-  _movimentarCamera() async{
+
+  _movimentarCamera() async {
     GoogleMapController googleMapController = await _controller.future;
-    googleMapController.animateCamera(
-      CameraUpdate.newCameraPosition(
+    googleMapController.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
-          target: LatLng(-23.563370, -46.652923),
+            target: LatLng(-23.563370, -46.652923),
             zoom: 19,
-          tilt: 45,
-          bearing: 270
-        )
-      )
-    );
+            tilt: 45,
+            bearing: 270)));
   }
-  _carregarMarcadores(){
+
+  _carregarMarcadores() {
     // Set<Marker> _marcadorLocal = {};
     // Marker marcadorShop = Marker(
     //   markerId: MarkerId("marcador shopping"),
@@ -84,7 +82,7 @@ class _HomeState extends State<Home> {
     // });
 
     //POLYLINES
-    Set<Polyline> listaPolylines ={};
+    Set<Polyline> listaPolylines = {};
     Polyline polyline1 = Polyline(
       polylineId: PolylineId("polygon1"),
       color: Colors.red,
@@ -97,7 +95,7 @@ class _HomeState extends State<Home> {
         LatLng(-23.563085, -46.650531),
       ],
       consumeTapEvents: true,
-      onTap: (){
+      onTap: () {
         print("aqui !");
       },
     );
@@ -105,16 +103,31 @@ class _HomeState extends State<Home> {
     setState(() {
       _polylines = listaPolylines;
     });
-}
+  }
+
+  _recuperarLocalizacaoAtual()  async{
+
+    Position position = await Geolocator().getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high
+    );
+    //-23.570893, -46.644995
+    //-23,570893, -46,644995
+
+    print("localizacao atual: " + position.toString() );
+  }
   @override
   void initState() {
-    _carregarMarcadores();
+    // _carregarMarcadores();
     super.initState();
+    _recuperarLocalizacaoAtual();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Mapas"),),
+      appBar: AppBar(
+        title: Text("Mapas"),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: _movimentarCamera,
@@ -123,10 +136,8 @@ class _HomeState extends State<Home> {
       body: Container(
         child: GoogleMap(
           mapType: MapType.satellite,
-          initialCameraPosition: CameraPosition(
-            target: LatLng(-23.562436, -46.655005),
-            zoom: 16
-          ),
+          initialCameraPosition:
+              CameraPosition(target: LatLng(-23.562436, -46.655005), zoom: 16),
           onMapCreated: _onMapCreated,
           markers: _marcadores,
           polygons: _polygons,
