@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:geolocator/geolocator.dart';
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -9,26 +9,25 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Completer<GoogleMapController> _controller = Completer();
+  CameraPosition _posicaoCamera = CameraPosition(
+      target: LatLng(-23.565160, -46.651797),
+      zoom: 19
+  );
   Set<Marker> _marcadores = {};
   Set<Polygon> _polygons = {};
   Set<Polyline> _polylines = {};
-  _onMapCreated(GoogleMapController googleMapController){
+  _onMapCreated(GoogleMapController googleMapController) {
     _controller.complete(googleMapController);
   }
-  _movimentarCamera() async{
+
+  _movimentarCamera() async {
     GoogleMapController googleMapController = await _controller.future;
-    googleMapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(-23.563370, -46.652923),
-            zoom: 19,
-          tilt: 45,
-          bearing: 270
-        )
-      )
-    );
+    googleMapController.animateCamera(CameraUpdate.newCameraPosition(
+      _posicaoCamera
+    ));
   }
-  _carregarMarcadores(){
+
+  _carregarMarcadores() {
     // Set<Marker> _marcadorLocal = {};
     // Marker marcadorShop = Marker(
     //   markerId: MarkerId("marcador shopping"),
@@ -84,7 +83,7 @@ class _HomeState extends State<Home> {
     // });
 
     //POLYLINES
-    Set<Polyline> listaPolylines ={};
+    Set<Polyline> listaPolylines = {};
     Polyline polyline1 = Polyline(
       polylineId: PolylineId("polygon1"),
       color: Colors.red,
@@ -97,7 +96,7 @@ class _HomeState extends State<Home> {
         LatLng(-23.563085, -46.650531),
       ],
       consumeTapEvents: true,
-      onTap: (){
+      onTap: () {
         print("aqui !");
       },
     );
@@ -105,16 +104,78 @@ class _HomeState extends State<Home> {
     setState(() {
       _polylines = listaPolylines;
     });
-}
+  }
+
+  _recuperarLocalizacaoAtual()  async{
+
+    Position position = await Geolocator().getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high
+    );
+    print("localizacao atual: " + position.toString() );
+    setState(() {
+      _posicaoCamera = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: 17
+      );
+      _movimentarCamera();
+    });
+    _adicionarListenerLocalizacao();
+  }
+  _adicionarListenerLocalizacao(){
+    print("entrou");
+    var geolocator = Geolocator();
+    var locationOptions = LocationOptions(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10
+    );
+    geolocator.getPositionStream( locationOptions )
+        .listen((Position position){
+
+      print("localizacao atual: " + position.toString() );
+
+      Marker marcadorUsuario = Marker(
+          markerId: MarkerId("marcador-usuario"),
+          position: LatLng(position.latitude, position.longitude),
+          infoWindow: InfoWindow(
+              title: "Meu local"
+          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueMagenta
+          ),
+          onTap: (){
+            print("Meu local clicado!!");
+          }
+        //rotation: 45
+      );
+
+      setState(() {
+        //-23.566989, -46.649598
+        //-23.568395, -46.648353
+        _marcadores.add( marcadorUsuario );
+        _posicaoCamera = CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 17
+        );
+        print("localizacao atual: " + position.toString() );
+        _movimentarCamera();
+
+      });
+
+    });
+
+  }
   @override
   void initState() {
-    _carregarMarcadores();
+    _recuperarLocalizacaoAtual();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Mapas"),),
+      appBar: AppBar(
+        title: Text("Mapas"),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: _movimentarCamera,
@@ -123,14 +184,10 @@ class _HomeState extends State<Home> {
       body: Container(
         child: GoogleMap(
           mapType: MapType.satellite,
-          initialCameraPosition: CameraPosition(
-            target: LatLng(-23.562436, -46.655005),
-            zoom: 16
-          ),
+          initialCameraPosition: _posicaoCamera,
           onMapCreated: _onMapCreated,
           markers: _marcadores,
-          polygons: _polygons,
-          polylines: _polylines,
+          myLocationEnabled: true,
         ),
       ),
     );
