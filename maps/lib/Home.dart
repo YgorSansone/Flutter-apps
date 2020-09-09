@@ -162,11 +162,52 @@ class _HomeState extends State<Home> {
       });
 
     });
+  }
+  _recuperarLocalParaEndereco() async{
+    List<Placemark> listaEndereco = await Geolocator().
+    placemarkFromAddress("Av paulista, 1700");
+    print("total: " + listaEndereco.length.toString());
+    if(listaEndereco != null && listaEndereco.length >0){
+      Placemark endereco = listaEndereco[0];
+      String resultado = "\n  administrativeArea: "+ endereco.administrativeArea;
+      resultado += "\n  subAdministrativeArea: "+ endereco.subAdministrativeArea;
+      resultado += "\n  subAdministrativeArea: "+ endereco.locality;
+      resultado += "\n  subAdministrativeArea: "+ endereco.subLocality;
+      resultado += "\n  subAdministrativeArea: "+ endereco.thoroughfare;
+      resultado += "\n  subAdministrativeArea: "+ endereco.subThoroughfare;
+      resultado += "\n  subAdministrativeArea: "+ endereco.postalCode;
+      resultado += "\n  subAdministrativeArea: "+ endereco.country;
+      resultado += "\n  subAdministrativeArea: "+ endereco.isoCountryCode;
+      resultado += "\n  subAdministrativeArea: "+ endereco.position.toString();
+      print(resultado);
 
+    }
+  }
+  _recuperarLocalParalatlong() async{
+    List<Placemark> listaEndereco = await Geolocator().
+    placemarkFromCoordinates(-23.560859, -46.6570211);
+    print("total: " + listaEndereco.length.toString());
+    if(listaEndereco != null && listaEndereco.length >0){
+      Placemark endereco = listaEndereco[0];
+      String resultado = "\n  administrativeArea: "+ endereco.administrativeArea;
+      resultado += "\n  subAdministrativeArea: "+ endereco.subAdministrativeArea;
+      resultado += "\n  subAdministrativeArea: "+ endereco.locality;
+      resultado += "\n  subAdministrativeArea: "+ endereco.subLocality;
+      resultado += "\n  subAdministrativeArea: "+ endereco.thoroughfare;
+      resultado += "\n  subAdministrativeArea: "+ endereco.subThoroughfare;
+      resultado += "\n  subAdministrativeArea: "+ endereco.postalCode;
+      resultado += "\n  subAdministrativeArea: "+ endereco.country;
+      resultado += "\n  subAdministrativeArea: "+ endereco.isoCountryCode;
+      resultado += "\n  subAdministrativeArea: "+ endereco.position.toString();
+      print(resultado);
+
+    }
   }
   @override
   void initState() {
-    _recuperarLocalizacaoAtual();
+    // _recuperarLocalizacaoAtual();
+    _recuperarLocalParaEndereco();
+    // _recuperarLocalParalatlong();
     super.initState();
   }
 
