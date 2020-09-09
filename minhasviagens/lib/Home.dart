@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:minhasviagens/Mapa.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -11,7 +13,9 @@ class _HomeState extends State<Home> {
   _abrirMapa(){
   }
   _excluirViagem(){}
-  _addLocal(){}
+  _addLocal(){
+    Navigator.push(context, MaterialPageRoute(builder: (_) => Mapa()));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +41,7 @@ class _HomeState extends State<Home> {
                     child: Card(
                       child: ListTile(
                         title: Text(titulo),
+                        subtitle: Text(titulo),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
