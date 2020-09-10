@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 class Mapa extends StatefulWidget {
   @override
   _MapaState createState() => _MapaState();
@@ -10,6 +11,7 @@ class Mapa extends StatefulWidget {
 
 class _MapaState extends State<Mapa> {
   Completer<GoogleMapController> _controller = Completer();
+  Firestore _db = Firestore.instance;
   Set<Marker> _marcadores = {};
   CameraPosition _posicaoCamera =
       CameraPosition(target: LatLng(-23.562436, -46.6555005), zoom: 18);
@@ -17,7 +19,8 @@ class _MapaState extends State<Mapa> {
     _controller.complete(controller);
   }
 
-  _exibirMarcador(LatLng latLng) async{
+
+  _addMarcador(LatLng latLng) async{
     List<Placemark> listaEnderecos = await Geolocator()
         .placemarkFromCoordinates(latLng.latitude, latLng.longitude);
     if(listaEnderecos != null && listaEnderecos.length >0){
@@ -30,6 +33,13 @@ class _MapaState extends State<Mapa> {
           infoWindow: InfoWindow(title: rua));
       setState(() {
         _marcadores.add(marcador);
+        //salvar no firebase
+        Map<String,dynamic> viagem = Map();
+        viagem["titulo"] = rua;
+        viagem["latitute"] = latLng.latitude;
+        viagem["longitude"] = latLng.longitude;
+        _db.collection("viagens")
+        .add(viagem);
       });
     }
 
@@ -54,9 +64,11 @@ class _MapaState extends State<Mapa> {
   }
 
   @override
-  void initState() {
+  void initState(){
     super.initState();
     _adicionarListenerLocalizacao();
+
+
   }
 
   @override
@@ -72,7 +84,7 @@ class _MapaState extends State<Mapa> {
           markers: _marcadores,
           onMapCreated: _onMapCreated,
           myLocationEnabled: true,
-          onLongPress: _exibirMarcador,
+          onLongPress: _addMarcador,
         ),
       ),
     );
