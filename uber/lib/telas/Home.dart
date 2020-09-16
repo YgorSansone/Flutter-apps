@@ -17,6 +17,7 @@ class _HomeState extends State<Home> {
   TextEditingController _controllerSenha = TextEditingController();
   bool _showPassword = false;
   String _mensagemErro = "";
+  bool _carregando = false;
   _validarCampos() {
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
@@ -39,6 +40,9 @@ class _HomeState extends State<Home> {
   }
 
   _logarUsuario(Usuario usuario) {
+    setState(() {
+      _carregando = true;
+    });
     FirebaseAuth auth = FirebaseAuth.instance;
     auth
         .signInWithEmailAndPassword(
@@ -56,6 +60,9 @@ class _HomeState extends State<Home> {
         await db.collection("usuarios").document(idUsuario).get();
     Map<String, dynamic> dados = snapshot.data;
     String tipoUsuario = dados["tipoUsuario"];
+    setState(() {
+      _carregando = false;
+    });
     switch(tipoUsuario){
       case "motorista":
         Navigator.pushNamedAndRemoveUntil(
@@ -160,6 +167,10 @@ class _HomeState extends State<Home> {
                     },
                   ),
                 ),
+                _carregando ?
+                    Center(child: CircularProgressIndicator(backgroundColor: Colors.white,),)
+                :
+                    Container(),
                 Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
