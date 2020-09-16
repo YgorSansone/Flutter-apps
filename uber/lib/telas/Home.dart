@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -36,17 +37,43 @@ class _HomeState extends State<Home> {
       });
     }
   }
-  _logarUsuario(Usuario usuario){
+
+  _logarUsuario(Usuario usuario) {
     FirebaseAuth auth = FirebaseAuth.instance;
-    auth.signInWithEmailAndPassword(
-        email: usuario.email,
-        password: usuario.senha
-    ).then((firebaseUser) {
-      Navigator.pushReplacementNamed(context, Rotas.ROTA_P_PASSAGEIRO);
-    }).catchError((error){
+    auth
+        .signInWithEmailAndPassword(
+            email: usuario.email, password: usuario.senha)
+        .then((firebaseUser) {
+      _PrimeiraPagina(firebaseUser.user.uid);
+    }).catchError((error) {
       _mensagemErro = "Login e senhas incorretos !";
     });
   }
+
+  _PrimeiraPagina(String idUsuario) async {
+    Firestore db = Firestore.instance;
+    DocumentSnapshot snapshot =
+        await db.collection("usuarios").document(idUsuario).get();
+    Map<String, dynamic> dados = snapshot.data;
+    String tipoUsuario = dados["tipoUsuario"];
+    switch(tipoUsuario){
+      case "motorista":
+        Navigator.pushNamedAndRemoveUntil(
+            context,
+            Rotas.ROTA_P_MOTORISTA,
+                (_) => false
+        );
+        break;
+      case "passageiro":
+        Navigator.pushNamedAndRemoveUntil(
+            context,
+            Rotas.ROTA_P_PASSAGEIRO,
+                (_) => false
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
