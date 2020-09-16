@@ -9,7 +9,7 @@ class _PainelMotoristaState extends State<PainelMotorista> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Painel passageiro"),
+        title: Text("Painel Motorista"),
       ),
       body: Container(),
     );

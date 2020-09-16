@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
+import 'package:uber/Rotas.dart';
+import 'package:uber/model/Usuario.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class Cadastro extends StatefulWidget {
   @override
   _CadastroState createState() => _CadastroState();
@@ -12,6 +15,63 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerSenha = TextEditingController();
   bool _showPassword = false;
   bool _tipousuario = false;
+  String _mensagemErro = "";
+  _validarCampos(){
+    String nome = _controllerNome.text;
+    String email = _controllerEmail.text;
+    String senha = _controllerSenha.text;
+    if(nome.isNotEmpty){
+      if(email.isNotEmpty && email.contains("@")){
+        if(senha.isNotEmpty && senha.length >6){
+          Usuario usuario = Usuario();
+          usuario.nome = nome;
+          usuario.email = email;
+          usuario.senha = senha;
+          usuario.tipoUsuario = usuario.verificaTipoUsuario(_tipousuario);
+          _cadastrarUsuario(usuario);
+        }else{
+          setState(() {
+            _mensagemErro = "Preencha a senha (6 caracteres minimo) !";
+          });
+        }
+      }else{
+        setState(() {
+          _mensagemErro = "Preencha o Email !";
+        });
+      }
+    }else{
+      setState(() {
+        _mensagemErro = "Preencha o Nome !";
+      });
+    }
+  }
+  _cadastrarUsuario(Usuario usuario){
+    FirebaseAuth auth = FirebaseAuth.instance;
+    Firestore db = Firestore.instance;
+    auth.createUserWithEmailAndPassword(
+        email: usuario.email, password: usuario.senha
+    ).then((firebaseUser) {
+      db.collection("usuarios")
+          .document(firebaseUser.user.uid)
+          .setData(usuario.toMap());
+      switch(usuario.tipoUsuario){
+        case "motorista":
+          Navigator.pushNamedAndRemoveUntil(
+              context,
+              Rotas.ROTA_P_MOTORISTA,
+                  (_) => false
+          );
+          break;
+        case "passageiro":
+          Navigator.pushNamedAndRemoveUntil(
+              context,
+              Rotas.ROTA_P_PASSAGEIRO,
+                  (_) => false
+          );
+          break;
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,14 +158,16 @@ class _CadastroState extends State<Cadastro> {
                     ),
                     color: Color(0xff1ebbd8),
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: () {},
+                    onPressed: () {
+                      _validarCampos();
+                    },
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
                     child: Text(
-                      "Erro",
+                      _mensagemErro,
                       style: TextStyle(color: Colors.red, fontSize: 20),
                     ),
                   ),
