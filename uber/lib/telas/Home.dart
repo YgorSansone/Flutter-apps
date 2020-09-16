@@ -80,6 +80,20 @@ class _HomeState extends State<Home> {
         break;
     }
   }
+  _verificarUsuarioLogado() async{
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    if(usuarioLogado !=null){
+      String idUsuario = usuarioLogado.uid;
+      _PrimeiraPagina(idUsuario);
+    }
+
+  }
+  @override
+  void initState() {
+    super.initState();
+    _verificarUsuarioLogado();
+  }
 
   @override
   Widget build(BuildContext context) {
