@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:uber/Rotas.dart';
+import 'package:uber/model/Usuario.dart';
 import 'package:uber/telas/Cadastro.dart';
 import 'package:uber/Rotas.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -12,6 +15,38 @@ class _HomeState extends State<Home> {
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
   bool _showPassword = false;
+  String _mensagemErro = "";
+  _validarCampos() {
+    String email = _controllerEmail.text;
+    String senha = _controllerSenha.text;
+    if (email.isNotEmpty && email.contains("@")) {
+      if (senha.isNotEmpty && senha.length > 6) {
+        Usuario usuario = Usuario();
+        usuario.email = email;
+        usuario.senha = senha;
+        _logarUsuario(usuario);
+      } else {
+        setState(() {
+          _mensagemErro = "Preencha a senha (6 caracteres minimo) !";
+        });
+      }
+    } else {
+      setState(() {
+        _mensagemErro = "Preencha o Email !";
+      });
+    }
+  }
+  _logarUsuario(Usuario usuario){
+    FirebaseAuth auth = FirebaseAuth.instance;
+    auth.signInWithEmailAndPassword(
+        email: usuario.email,
+        password: usuario.senha
+    ).then((firebaseUser) {
+      Navigator.pushReplacementNamed(context, Rotas.ROTA_P_PASSAGEIRO);
+    }).catchError((error){
+      _mensagemErro = "Login e senhas incorretos !";
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,14 +92,16 @@ class _HomeState extends State<Home> {
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         hintText: "senha",
                         filled: true,
-                        suffixIcon:  IconButton(
-                            icon: Icon(
-                              Icons.remove_red_eye,
-                              color: this._showPassword ? Colors.blue : Colors.grey,
-                            ),
-                            onPressed: () {
-                              setState(() => this._showPassword = !this._showPassword);
-                            },
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            Icons.remove_red_eye,
+                            color:
+                                this._showPassword ? Colors.blue : Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(
+                                () => this._showPassword = !this._showPassword);
+                          },
                         ),
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -80,7 +117,9 @@ class _HomeState extends State<Home> {
                     ),
                     color: Color(0xff1ebbd8),
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: () {},
+                    onPressed: () {
+                      _validarCampos();
+                    },
                   ),
                 ),
                 Center(
@@ -98,7 +137,7 @@ class _HomeState extends State<Home> {
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
                     child: Text(
-                      "Erro",
+                      _mensagemErro,
                       style: TextStyle(color: Colors.red, fontSize: 20),
                     ),
                   ),

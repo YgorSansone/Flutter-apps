@@ -70,6 +70,8 @@ class _CadastroState extends State<Cadastro> {
           );
           break;
       }
+    }).catchError((error){
+      _mensagemErro = "Erro ao cadastrar usuario";
     });
   }
   @override
