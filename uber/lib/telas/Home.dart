@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:uber/Rotas.dart';
 import 'package:uber/telas/Cadastro.dart';
-
+import 'package:uber/Rotas.dart';
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -89,9 +90,7 @@ class _HomeState extends State<Home> {
                       style: TextStyle(color: Colors.white),
                     ),
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context)=> Cadastro()
-                      ));
+                      Navigator.pushNamed(context, Rotas.ROTA_CADASTRO);
                     },
                   ),
                 ),
