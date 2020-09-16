@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:uber/Rotas.dart';
+import 'package:uber/model/Usuario.dart';
 import 'package:uber/telas/Cadastro.dart';
 import 'package:uber/Rotas.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -12,6 +16,85 @@ class _HomeState extends State<Home> {
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
   bool _showPassword = false;
+  String _mensagemErro = "";
+  bool _carregando = false;
+  _validarCampos() {
+    String email = _controllerEmail.text;
+    String senha = _controllerSenha.text;
+    if (email.isNotEmpty && email.contains("@")) {
+      if (senha.isNotEmpty && senha.length > 6) {
+        Usuario usuario = Usuario();
+        usuario.email = email;
+        usuario.senha = senha;
+        _logarUsuario(usuario);
+      } else {
+        setState(() {
+          _mensagemErro = "Preencha a senha (6 caracteres minimo) !";
+        });
+      }
+    } else {
+      setState(() {
+        _mensagemErro = "Preencha o Email !";
+      });
+    }
+  }
+
+  _logarUsuario(Usuario usuario) {
+    setState(() {
+      _carregando = true;
+    });
+    FirebaseAuth auth = FirebaseAuth.instance;
+    auth
+        .signInWithEmailAndPassword(
+            email: usuario.email, password: usuario.senha)
+        .then((firebaseUser) {
+      _PrimeiraPagina(firebaseUser.user.uid);
+    }).catchError((error) {
+      _mensagemErro = "Login e senhas incorretos !";
+    });
+  }
+
+  _PrimeiraPagina(String idUsuario) async {
+    Firestore db = Firestore.instance;
+    DocumentSnapshot snapshot =
+        await db.collection("usuarios").document(idUsuario).get();
+    Map<String, dynamic> dados = snapshot.data;
+    String tipoUsuario = dados["tipoUsuario"];
+    setState(() {
+      _carregando = false;
+    });
+    switch(tipoUsuario){
+      case "motorista":
+        Navigator.pushNamedAndRemoveUntil(
+            context,
+            Rotas.ROTA_P_MOTORISTA,
+                (_) => false
+        );
+        break;
+      case "passageiro":
+        Navigator.pushNamedAndRemoveUntil(
+            context,
+            Rotas.ROTA_P_PASSAGEIRO,
+                (_) => false
+        );
+        break;
+    }
+  }
+  _verificarUsuarioLogado() async{
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    if(usuarioLogado !=null){
+      String idUsuario = usuarioLogado.uid;
+      _PrimeiraPagina(idUsuario);
+    }
+
+  }
+  @override
+  void initState() {
+    super.initState();
+    _verificarUsuarioLogado();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,14 +140,16 @@ class _HomeState extends State<Home> {
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         hintText: "senha",
                         filled: true,
-                        suffixIcon:  IconButton(
-                            icon: Icon(
-                              Icons.remove_red_eye,
-                              color: this._showPassword ? Colors.blue : Colors.grey,
-                            ),
-                            onPressed: () {
-                              setState(() => this._showPassword = !this._showPassword);
-                            },
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            Icons.remove_red_eye,
+                            color:
+                                this._showPassword ? Colors.blue : Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(
+                                () => this._showPassword = !this._showPassword);
+                          },
                         ),
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -80,7 +165,9 @@ class _HomeState extends State<Home> {
                     ),
                     color: Color(0xff1ebbd8),
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: () {},
+                    onPressed: () {
+                      _validarCampos();
+                    },
                   ),
                 ),
                 Center(
@@ -94,11 +181,15 @@ class _HomeState extends State<Home> {
                     },
                   ),
                 ),
+                _carregando ?
+                    Center(child: CircularProgressIndicator(backgroundColor: Colors.white,),)
+                :
+                    Container(),
                 Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
                     child: Text(
-                      "Erro",
+                      _mensagemErro,
                       style: TextStyle(color: Colors.red, fontSize: 20),
                     ),
                   ),

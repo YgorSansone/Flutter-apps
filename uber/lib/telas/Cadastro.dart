@@ -15,6 +15,7 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerSenha = TextEditingController();
   bool _showPassword = false;
   bool _tipousuario = false;
+  bool _carregando = false;
   String _mensagemErro = "";
   _validarCampos(){
     String nome = _controllerNome.text;
@@ -28,6 +29,9 @@ class _CadastroState extends State<Cadastro> {
           usuario.email = email;
           usuario.senha = senha;
           usuario.tipoUsuario = usuario.verificaTipoUsuario(_tipousuario);
+          setState(() {
+            _carregando = true;
+          });
           _cadastrarUsuario(usuario);
         }else{
           setState(() {
@@ -54,6 +58,9 @@ class _CadastroState extends State<Cadastro> {
       db.collection("usuarios")
           .document(firebaseUser.user.uid)
           .setData(usuario.toMap());
+      setState(() {
+        _carregando = false;
+      });
       switch(usuario.tipoUsuario){
         case "motorista":
           Navigator.pushNamedAndRemoveUntil(
@@ -70,6 +77,8 @@ class _CadastroState extends State<Cadastro> {
           );
           break;
       }
+    }).catchError((error){
+      _mensagemErro = "Erro ao cadastrar usuario";
     });
   }
   @override
@@ -163,6 +172,10 @@ class _CadastroState extends State<Cadastro> {
                     },
                   ),
                 ),
+                _carregando ?
+                Center(child: CircularProgressIndicator(backgroundColor: Colors.white,),)
+                    :
+                Container(),
                 Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
