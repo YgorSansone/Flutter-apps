@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
+import 'package:uber/Rotas.dart';
+import 'package:uber/telas/Cadastro.dart';
+import 'package:uber/Rotas.dart';
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -87,7 +89,9 @@ class _HomeState extends State<Home> {
                       "Não tem conta? cadastre-se!",
                       style: TextStyle(color: Colors.white),
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, Rotas.ROTA_CADASTRO);
+                    },
                   ),
                 ),
                 Padding(
