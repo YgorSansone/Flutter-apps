@@ -10,6 +10,7 @@ void main() {
     title: "Uber",
     home: Home(),
     theme: temaPadrao,
+    // theme: ThemeData.dark(),
     initialRoute: Rotas.ROTA,
     onGenerateRoute: Rotas.gerarRotas,
     debugShowCheckedModeBanner: false,
