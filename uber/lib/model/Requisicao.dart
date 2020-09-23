@@ -1,6 +1,6 @@
 import 'package:uber/model/Destino.dart';
 import 'package:uber/model/Usuario.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 class Requisicao {
   String _id;
   String _status;
@@ -8,7 +8,11 @@ class Requisicao {
   Usuario _motorista;
   Destino _destino;
 
-  Requisicao();
+  Requisicao(){
+    Firestore db = Firestore.instance;
+    DocumentReference ref = db.collection("requisicoes").document();
+    this.id= ref.documentID;
+  }
   Map<String, dynamic> toMap(){
     Map<String, dynamic> dadosPassageiro={
       "nome" : this.passageiro.nome,
@@ -25,6 +29,7 @@ class Requisicao {
       "longitude" : this.destino.longitude,
     };
     Map<String, dynamic> dadosRequisicao={
+      "id" : this.id,
       "status" : this.status,
       "passageiro" : dadosPassageiro,
       "motorista" : null,
