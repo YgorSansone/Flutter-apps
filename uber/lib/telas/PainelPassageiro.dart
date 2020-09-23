@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/rendering.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber/Rotas.dart';
+import 'package:uber/model/Destino.dart';
 
 class PainelPassageiro extends StatefulWidget {
   @override
@@ -13,7 +15,7 @@ class PainelPassageiro extends StatefulWidget {
 }
 
 class _PainelPassageiroState extends State<PainelPassageiro> {
-
+  TextEditingController _controllerDestino = TextEditingController(text: "av. paulista, 807");
   List<String> itensMenu = [
    "Deslogar"
   ];
@@ -21,6 +23,52 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   CameraPosition _posicaoCamera = CameraPosition(
       target: LatLng(-23.563999, -46.653256)
   );
+  Set<Marker> _marcadores = {};
+
+  _chamaruber()async{
+    String enderecoDestino = _controllerDestino.text;
+    if(enderecoDestino.isNotEmpty){
+      List<Placemark> listaEnderecos = await Geolocator().placemarkFromAddress(enderecoDestino);
+      Placemark endereco = listaEnderecos[0];
+      Destino destino = Destino();
+      destino.cidade = endereco.administrativeArea;
+      destino.cep = endereco.postalCode;
+      destino.bairro = endereco.subLocality;
+      destino.rua = endereco.thoroughfare;
+      destino.numero = endereco.subThoroughfare;
+
+      destino.latitude = endereco.position.latitude;
+      destino.longitude = endereco.position.longitude;
+      String enderecoConfirmacao;
+      enderecoConfirmacao = "\n Cidade: " +destino.cidade;
+      enderecoConfirmacao += "\n Rua: " +destino.rua + ", " +destino.numero;
+      enderecoConfirmacao += "\n Bairro: " +destino.bairro;
+      enderecoConfirmacao += "\n Cep: " +destino.cep;
+      showDialog(
+          context: context,
+        builder: (context){
+            return AlertDialog(
+              title: Text("Confirmacao do endereco"),
+              content: Text(enderecoConfirmacao),
+              contentPadding: EdgeInsets.all(16),
+              actions: [
+                FlatButton(
+                  child: Text("Cancelar", style: TextStyle(color: Colors.red),),
+                  onPressed: () =>Navigator.pop(context),
+                ),
+                FlatButton(
+                  child: Text("Confirmar", style: TextStyle(color: Colors.green),),
+                  onPressed: () {
+                    //salvar_requisicao
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+        }
+      );
+    }
+  }
 
   _deslogarUsuario() async {
 
@@ -46,24 +94,26 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   }
 
   _adicionarListenerLocalizacao(){
-
-    var geolocator = Geolocator();
-    var locationOptions = LocationOptions(
+    try {
+      var geolocator = Geolocator();
+      var locationOptions = LocationOptions(
         accuracy: LocationAccuracy.high,
         distanceFilter: 10
-    );
-
-    geolocator.getPositionStream( locationOptions ).listen((Position position){
-
-      _posicaoCamera = CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 19
       );
 
-      _movimentarCamera( _posicaoCamera );
-
-    });
-
+      geolocator.getPositionStream(locationOptions).listen((Position position) {
+        _posicaoCamera = CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 19
+        );
+        setState(() {
+          _exivirMarcadorPassageiro(position);
+          _movimentarCamera(_posicaoCamera);
+        });
+      });
+    }catch (e) {
+    print("erro " + e);
+    }
   }
 
   _recuperaUltimaLocalizacaoConhecida() async {
@@ -73,9 +123,10 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     setState(() {
       if( position != null ){
+        _exivirMarcadorPassageiro(position);
         _posicaoCamera = CameraPosition(
             target: LatLng(position.latitude, position.longitude),
-            zoom: 19
+            zoom: 10
         );
 
         _movimentarCamera( _posicaoCamera );
@@ -95,11 +146,31 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     );
 
   }
+  _exivirMarcadorPassageiro(Position local) async{
+    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "imagens/passageiro.png"
+    ).then((BitmapDescriptor icone){
+      Marker marcadorPassageiro = Marker(
+          markerId: MarkerId("marcador-passageiro"),
+          position: LatLng(local.latitude, local.longitude),
+          infoWindow: InfoWindow(
+              title: "Meu local"
+          ),
+          icon: icone
+      );
+      setState(() {
+        _marcadores.add(marcadorPassageiro);
+      });
+    });
+
+  }
 
   @override
   void initState() {
     super.initState();
-    _recuperaUltimaLocalizacaoConhecida();
+    // _recuperaUltimaLocalizacaoConhecida();
     _adicionarListenerLocalizacao();
   }
 
@@ -133,8 +204,9 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
               mapType: MapType.normal,
               initialCameraPosition: _posicaoCamera,
               onMapCreated: _onMapCreated,
-              myLocationEnabled: true,
+              // myLocationEnabled: true,
               myLocationButtonEnabled: false,
+              markers:_marcadores ,
               //-23,559200, -46,658878
             ),
             Positioned(
@@ -184,6 +256,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
                       color: Colors.black54
                   ),
                   child: TextField(
+                    controller:  _controllerDestino,
                     decoration: InputDecoration(
                         icon: Container(
                           margin: EdgeInsets.only(left: 20),
@@ -214,6 +287,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
                   color: Color(0xff1ebbd8),
                   padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                   onPressed: () {
+                    _chamaruber();
                     // _validarCampos();
                   },
                 ),

@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:uber/Rotas.dart';
 import 'package:uber/model/Usuario.dart';
-import 'package:uber/telas/Cadastro.dart';
-import 'package:uber/Rotas.dart';
 
 class Home extends StatefulWidget {
   @override
