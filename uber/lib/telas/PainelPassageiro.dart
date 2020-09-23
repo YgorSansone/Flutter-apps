@@ -29,6 +29,38 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
       target: LatLng(-23.563999, -46.653256)
   );
   Set<Marker> _marcadores = {};
+  bool _exibirCaixaEnderecoDestino = true;
+  String _textoBotao = "Chamar Uber";
+  Color _corBotao = Color(0xff1ebbd8);
+  Function _funcaoBotao;
+  _alterarBotaoPrincipal(String texto, Color cor, Function funcao){
+    setState(() {
+      _textoBotao = texto;
+      _corBotao = cor;
+      _funcaoBotao = funcao;
+    });
+  }
+  _statusUberNaoChamado(){
+    _exibirCaixaEnderecoDestino = true;
+    _alterarBotaoPrincipal(
+        "Chamar Uber",
+        Color(0xff1ebbd8),
+        (){
+          _chamaruber();
+        });
+  }
+  _statusAguardando(){
+    _exibirCaixaEnderecoDestino = false;
+    _alterarBotaoPrincipal(
+        "Cancelar",
+        Colors.red,
+            (){
+              _cancelarUber();
+        });
+  }
+  _cancelarUber(){
+
+  }
   _salvarRequisicao(Destino destino) async{
     Usuario passageiro = await UsuarioFirebase.getDadosUsuarioLogado();
     Requisicao requisicao = Requisicao();
@@ -39,6 +71,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     Firestore db = Firestore.instance;
     db.collection("requisicoes")
     .add(requisicao.toMap());
+    _statusAguardando();
   }
   _chamaruber()async{
     String enderecoDestino = _controllerDestino.text;
@@ -188,6 +221,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     super.initState();
     // _recuperaUltimaLocalizacaoConhecida();
     _adicionarListenerLocalizacao();
+    _statusUberNaoChamado();
   }
 
   @override
@@ -225,70 +259,79 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
               markers:_marcadores ,
               //-23,559200, -46,658878
             ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                    width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(3),
-                    color: Colors.black54
-                  ),
-                  child: TextField(
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      icon: Container(
-                        margin: EdgeInsets.only(left: 20),
-                        width: 10,
-                        height: 25,
-                        child: Icon(Icons.location_on, color:  Colors.white,),
-                      ),
-                      hintText: "Meu local",
-                      border: InputBorder.none,
 
-                      contentPadding: EdgeInsets.only(left: 10,top: 0)
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 55,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(3),
-                      color: Colors.black54
-                  ),
-                  child: TextField(
-                    controller:  _controllerDestino,
-                    decoration: InputDecoration(
-                        icon: Container(
-                          margin: EdgeInsets.only(left: 20),
-                          width: 10,
-                          height: 25,
-                          child: Icon(Icons.local_taxi, color:  Colors.white,),
+          Visibility(
+            visible: _exibirCaixaEnderecoDestino,
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Container(
+                      height: 50,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(3),
+                          color: Colors.black54
+                      ),
+                      child: TextField(
+                        readOnly: true,
+                        decoration: InputDecoration(
+                            icon: Container(
+                              margin: EdgeInsets.only(left: 20),
+                              width: 10,
+                              height: 25,
+                              child: Icon(Icons.location_on, color:  Colors.white,),
+                            ),
+                            hintText: "Meu local",
+                            border: InputBorder.none,
+
+                            contentPadding: EdgeInsets.only(left: 10,top: 0)
                         ),
-                        hintText: "Digite o destino",
-                        border: InputBorder.none,
-                      hoverColor: Colors.white,
-                        contentPadding: EdgeInsets.only(left: 10,top: 0),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                Positioned(
+                  top: 55,
+                  left: 0,
+                  right: 0,
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Container(
+                      height: 50,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(3),
+                          color: Colors.black54
+                      ),
+                      child: TextField(
+                        controller:  _controllerDestino,
+                        decoration: InputDecoration(
+                          icon: Container(
+                            margin: EdgeInsets.only(left: 20),
+                            width: 10,
+                            height: 25,
+                            child: Icon(Icons.local_taxi, color:  Colors.white,),
+                          ),
+                          hintText: "Digite o destino",
+                          border: InputBorder.none,
+                          hoverColor: Colors.white,
+                          contentPadding: EdgeInsets.only(left: 10,top: 0),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
+          ),
+
             Positioned(
               right: 0,
               left: 0,
@@ -297,15 +340,12 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
                 padding: Platform.isIOS ? EdgeInsets.fromLTRB(20, 10, 20, 25):EdgeInsets.all(10) ,
                 child: RaisedButton(
                   child: Text(
-                    "Chamar Uber",
+                    _textoBotao,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color: Color(0xff1ebbd8),
+                  color: _corBotao,
                   padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  onPressed: () {
-                    _chamaruber();
-                    // _validarCampos();
-                  },
+                  onPressed: _funcaoBotao,
                 ),
               ),
             )
