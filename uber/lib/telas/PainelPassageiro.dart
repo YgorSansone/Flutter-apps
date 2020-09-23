@@ -61,6 +61,36 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   _cancelarUber(){
 
   }
+  _adicionarListenerRequisicaoAtiva() async{
+    FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
+    Firestore db = Firestore.instance;
+    await db.collection("requisicao_ativa")
+    .document(firebaseUser.uid)
+    .snapshots()
+    .listen((snapshot) {
+      if(snapshot.data != null){
+        Map<String, dynamic> dados = snapshot.data;
+        String status = dados["status"];
+        String idRequisicao = dados["id_requisicao"];
+        switch(status){
+          case StatusRequisicao.AGUARDANDO:
+            _statusAguardando();
+            break;
+          case StatusRequisicao.A_CAMINHO:
+            break;
+          case StatusRequisicao.VIAGEM:
+            break;
+          case StatusRequisicao.FINALIZADA:
+            break;
+          case StatusRequisicao.CANCELADA:
+            break;
+        }
+
+      }else{
+        _statusUberNaoChamado();
+      }
+    });
+  }
   _salvarRequisicao(Destino destino) async{
     Usuario passageiro = await UsuarioFirebase.getDadosUsuarioLogado();
     Requisicao requisicao = Requisicao();
@@ -70,8 +100,16 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     Firestore db = Firestore.instance;
     db.collection("requisicoes")
-    .add(requisicao.toMap());
-    _statusAguardando();
+    .document(requisicao.id)
+    .setData(requisicao.toMap());
+
+    Map<String, dynamic> dadosRequisicaoAtiva = {};
+    dadosRequisicaoAtiva["id_requisicao"] = requisicao.id;
+    dadosRequisicaoAtiva["id_usuario"] = passageiro.idUsuario;
+    dadosRequisicaoAtiva["status"] = StatusRequisicao.AGUARDANDO;
+    db.collection("requisicao_ativa")
+    .document(passageiro.idUsuario)
+    .setData(dadosRequisicaoAtiva);
   }
   _chamaruber()async{
     String enderecoDestino = _controllerDestino.text;
@@ -221,7 +259,8 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     super.initState();
     // _recuperaUltimaLocalizacaoConhecida();
     _adicionarListenerLocalizacao();
-    _statusUberNaoChamado();
+    _adicionarListenerRequisicaoAtiva();
+    // _statusUberNaoChamado();
   }
 
   @override
