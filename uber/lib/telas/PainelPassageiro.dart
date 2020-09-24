@@ -29,6 +29,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
       target: LatLng(-23.563999, -46.653256)
   );
   Set<Marker> _marcadores = {};
+  String _idRequisicao;
   bool _exibirCaixaEnderecoDestino = true;
   String _textoBotao = "Chamar Uber";
   Color _corBotao = Color(0xff1ebbd8);
@@ -58,7 +59,17 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
               _cancelarUber();
         });
   }
-  _cancelarUber(){
+  _cancelarUber() async{
+    FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+    .document( _idRequisicao).updateData({
+      "status": StatusRequisicao.CANCELADA
+    }).then((_){
+      db.collection("requisicao_ativa")
+          .document(firebaseUser.uid)
+          .delete();
+    });
 
   }
   _adicionarListenerRequisicaoAtiva() async{
@@ -71,7 +82,9 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
       if(snapshot.data != null){
         Map<String, dynamic> dados = snapshot.data;
         String status = dados["status"];
-        String idRequisicao = dados["id_requisicao"];
+        setState(() {
+          _idRequisicao = dados["id_requisicao"];
+        });
         switch(status){
           case StatusRequisicao.AGUARDANDO:
             _statusAguardando();
