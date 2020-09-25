@@ -72,6 +72,53 @@ class _CorridaState extends State<Corrida> {
         "A caminho do passageiro",
         Colors.grey,
     null);
+    double latitudePassageiro = _dadosRequisicao["passageiro"]["latitude"];
+    double longitudePassageiro = _dadosRequisicao["passageiro"]["longitude"];
+
+    double latitudeMotorista = _dadosRequisicao["motorista"]["latitude"];
+    double longitudeMotorista = _dadosRequisicao["motorista"]["longitude"];
+    _exibirDoisMarcadores(
+    LatLng(latitudeMotorista,longitudeMotorista),
+    LatLng(latitudePassageiro,longitudePassageiro));
+  }
+  _exibirDoisMarcadores(LatLng latLngM, LatLng latLngP){
+    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    Set<Marker> _listaMarcadores = {};
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "imagens/motorista.png"
+    ).then((BitmapDescriptor icone){
+      Marker marcadorMotorista = Marker(
+          markerId: MarkerId("marcador-motorista"),
+          position: LatLng(latLngM.latitude, latLngM.longitude),
+          infoWindow: InfoWindow(
+              title: "Local motorista"
+          ),
+          icon: icone
+      );
+      _listaMarcadores.add(marcadorMotorista);
+    });
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "imagens/passageiro.png"
+    ).then((BitmapDescriptor icone){
+      Marker marcadorPassageiro = Marker(
+          markerId: MarkerId("marcador-passageiro"),
+          position: LatLng(latLngP.latitude, latLngP.longitude),
+          infoWindow: InfoWindow(
+              title: "Local passageiro"
+          ),
+          icon: icone
+      );
+      _listaMarcadores.add(marcadorPassageiro);
+    });
+    setState(() {
+      _marcadores = _listaMarcadores;
+      _movimentarCamera(CameraPosition(
+        target: LatLng(latLngM.latitude, latLngM.longitude),
+        zoom: 18
+      ));
+    });
   }
   _aceitarCorrida()async{
     Usuario motorista = await UsuarioFirebase.getDadosUsuarioLogado();
