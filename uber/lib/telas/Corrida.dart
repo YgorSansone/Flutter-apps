@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:uber/model/Usuario.dart';
 import 'package:uber/util/StatusRequisicao.dart';
-
+import 'package:uber/util/UsuarioFirebase.dart';
 import '../Rotas.dart';
 
 class Corrida extends StatefulWidget {
@@ -24,6 +25,7 @@ class _CorridaState extends State<Corrida> {
     "Deslogar"
   ];
   bool _exibirCaixaEnderecoDestino = true;
+  Map<String, dynamic> _dadosRequisicao;
   String _textoBotao = "Aceitar corrida";
   Color _corBotao = Color(0xff1ebbd8);
   Function _funcaoBotao;
@@ -32,6 +34,7 @@ class _CorridaState extends State<Corrida> {
       target: LatLng(-23.563999, -46.653256)
   );
   Set<Marker> _marcadores = {};
+  Position _localMotorista;
 
   _alterarBotaoPrincipal(String texto, Color cor, Function funcao){
     setState(() {
@@ -50,13 +53,52 @@ class _CorridaState extends State<Corrida> {
   }
 
   _escolhaMenuItem( String escolha ){
-
     switch( escolha ){
       case "Deslogar" :
         _deslogarUsuario();
         break;
     }
+  }
+  _statusAguardando(){
 
+    _alterarBotaoPrincipal(
+        "Aceitar corrida",
+        Color(0xff1ebbd8), (){
+          _aceitarCorrida();
+        });
+  }
+  _statusAcaminho(){
+    _alterarBotaoPrincipal(
+        "A caminho do passageiro",
+        Colors.grey,
+    null);
+  }
+  _aceitarCorrida()async{
+    Usuario motorista = await UsuarioFirebase.getDadosUsuarioLogado();
+    motorista.latitude = _localMotorista.latitude;
+    motorista.longitude = _localMotorista.longitude;
+    Firestore db = Firestore.instance;
+    String idRequisicao = _dadosRequisicao["id"];
+    db.collection("requisicoes")
+    .document(idRequisicao).updateData({
+      "motorista" : motorista.toMap(),
+      "status" : StatusRequisicao.A_CAMINHO,
+    }).then((_) {
+      //atualizar requisicao
+      //salvar requisicao
+      String idPassageiro = _dadosRequisicao["passageiro"]["idUsuario"];
+      db.collection("requisicao_ativa")
+      .document(idPassageiro).updateData({
+        "status" : StatusRequisicao.A_CAMINHO,
+      });
+      String idMotorista = motorista.idUsuario;
+      db.collection("requisicao_ativa_motorista")
+          .document(idMotorista).setData({
+        "id_requisicao" : idRequisicao,
+        "id_usuario" : idMotorista,
+        "status" : StatusRequisicao.A_CAMINHO,
+      });
+    });
   }
 
   _onMapCreated( GoogleMapController controller ){
@@ -79,6 +121,7 @@ class _CorridaState extends State<Corrida> {
         setState(() {
           _exivirMarcadorPassageiro(position);
           _movimentarCamera(_posicaoCamera);
+          _localMotorista = position;
         });
       });
     }catch (e) {
@@ -115,12 +158,52 @@ class _CorridaState extends State<Corrida> {
     });
 
   }
+  _recuperarRequisicao()async{
+    String idRequisicao = widget.idRequisicao;
+    Firestore db = Firestore.instance;
+    DocumentSnapshot documentSnapshot = await db
+    .collection("requisicoes")
+    .document(idRequisicao)
+    .get();
+    _dadosRequisicao = documentSnapshot.data;
+    _adicionarListenerRequisicao();
+  }
+  _adicionarListenerRequisicao()async{
+    Firestore db = Firestore.instance;
+    String idRequisicao = _dadosRequisicao["id"];
+    await db.collection("requisicoes")
+    .document(idRequisicao).snapshots().listen((snapshot) {
+      if(snapshot.data != null){
+        Map<String,dynamic> dados = snapshot.data;
+        String status = dados["status"];
+        switch(status){
+          case StatusRequisicao.AGUARDANDO:
+            _statusAguardando();
+            break;
+          case StatusRequisicao.A_CAMINHO:
+            _statusAcaminho();
+            break;
+          case StatusRequisicao.VIAGEM:
+            break;
+          case StatusRequisicao.FINALIZADA:
+            break;
+          case StatusRequisicao.CANCELADA:
+            break;
+        }
+      }
+    });
+  }
   @override
   void initState() {
     super.initState();
     _adicionarListenerLocalizacao();
     // _adicionarListenerRequisicaoAtiva();
+    //recuperar requisicao e
+    //adicionar listener para mudanca de status
+    _recuperarRequisicao();
+
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,6 +236,7 @@ class _CorridaState extends State<Corrida> {
                 onMapCreated: _onMapCreated,
                 // myLocationEnabled: true,
                 myLocationButtonEnabled: false,
+                zoomControlsEnabled: false,
                 markers:_marcadores ,
                 //-23,559200, -46,658878
               ),
