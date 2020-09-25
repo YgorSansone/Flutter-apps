@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:uber/util/StatusRequisicao.dart';
+import 'package:uber/util/UsuarioFirebase.dart';
 
 import '../Rotas.dart';
 
@@ -41,11 +42,25 @@ class _PainelMotoristaState extends State<PainelMotorista> {
       _controller.add(dados);
     });
   }
+  _recuperaRequisicaoAtiva()async{
+    FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
+    DocumentSnapshot documentSnapshot = await
+    db.collection("requisicao_ativa_motorista")
+    .document(firebaseUser.uid).get();
+    var dadosRequisicao = documentSnapshot.data;
+    if(dadosRequisicao == null){
+      _adicionarListenerRequisicao();
+    }else{
+      String idRequisicao = dadosRequisicao["id_requisicao"];
+      Navigator.pushReplacementNamed(context, Rotas.ROTA_CORRIDA, arguments: idRequisicao);
+    }
 
+  }
   @override
   void initState() {
     super.initState();
-    _adicionarListenerRequisicao();
+    _recuperaRequisicaoAtiva();
+
   }
 
   @override
