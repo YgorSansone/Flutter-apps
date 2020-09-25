@@ -34,6 +34,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   String _textoBotao = "Chamar Uber";
   Color _corBotao = Color(0xff1ebbd8);
   Function _funcaoBotao;
+  Position _localPassageiro;
   _alterarBotaoPrincipal(String texto, Color cor, Function funcao){
     setState(() {
       _textoBotao = texto;
@@ -57,6 +58,14 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
         Colors.red,
             (){
               _cancelarUber();
+        });
+  }
+  _statusAcaminho(){
+    _exibirCaixaEnderecoDestino = false;
+    _alterarBotaoPrincipal(
+        "Motorista a caminho",
+        Colors.grey,
+            (){
         });
   }
   _cancelarUber() async{
@@ -90,6 +99,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
             _statusAguardando();
             break;
           case StatusRequisicao.A_CAMINHO:
+            _statusAcaminho();
             break;
           case StatusRequisicao.VIAGEM:
             break;
@@ -107,6 +117,8 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   _salvarRequisicao(Destino destino) async{
     Usuario passageiro = await UsuarioFirebase.getDadosUsuarioLogado();
     Requisicao requisicao = Requisicao();
+    passageiro.latitude = _localPassageiro.latitude;
+    passageiro.longitude = _localPassageiro.longitude;
     requisicao.destino = destino;
     requisicao.passageiro = passageiro;
     requisicao.status = StatusRequisicao.AGUARDANDO;
@@ -209,6 +221,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
         setState(() {
           _exivirMarcadorPassageiro(position);
           _movimentarCamera(_posicaoCamera);
+          _localPassageiro = position;
         });
       });
     }catch (e) {
