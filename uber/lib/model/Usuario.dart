@@ -10,6 +10,7 @@ class Usuario{
   Usuario();
   Map<String, dynamic> toMap(){
     Map<String, dynamic> map ={
+      "idUsuario" : this.idUsuario,
       "nome" : this.nome,
       "email" : this.email,
       "tipoUsuario" : this.tipoUsuario,
