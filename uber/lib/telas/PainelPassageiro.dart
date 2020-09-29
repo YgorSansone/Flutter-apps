@@ -50,15 +50,12 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
       case "Deslogar":
         _deslogarUsuario();
         break;
-      case "Configurações":
-        break;
     }
   }
 
   _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
   }
-
   _adicionarListenerLocalizacao() {
     var geolocator = Geolocator();
     var locationOptions =
@@ -188,16 +185,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
   }
 
   _salvarRequisicao(Destino destino) async {
-    /*
 
-    + requisicao
-      + ID_REQUISICAO
-        + destino (rua, endereco, latitude...)
-        + passageiro (nome, email...)
-        + motorista (nome, email..)
-        + status (aguardando, a_caminho...finalizada)
-
-    * */
 
     Usuario passageiro = await UsuarioFirebase.getDadosUsuarioLogado();
     passageiro.latitude = _localPassageiro.latitude;
@@ -385,6 +373,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
     });
 
   }
+
 
   _cancelarUber() async {
 
@@ -601,5 +590,10 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
         ],
       )),
     );
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    _streamSubscriptionRequisicoes.cancel();
   }
 }
