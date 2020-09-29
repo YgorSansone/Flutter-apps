@@ -33,33 +33,54 @@ class _PainelMotoristaState extends State<PainelMotorista> {
     }
   }
 
-  Stream<QuerySnapshot> _adicionarListenerRequisicao() {
-    final stram = db
-        .collection("requisicoes")
-        .where("status", isEqualTo: StatusRequisicao.AGUARDANDO)
+  Stream<QuerySnapshot> _adicionarListenerRequisicoes(){
+
+    final stream = db.collection("requisicoes")
+        .where("status", isEqualTo: StatusRequisicao.AGUARDANDO )
         .snapshots();
-    stram.listen((dados) {
-      _controller.add(dados);
+
+    stream.listen((dados){
+      _controller.add( dados );
     });
+
   }
-  _recuperaRequisicaoAtiva()async{
+
+  _recuperaRequisicaoAtivaMotorista() async {
+
+    //Recupera dados do usuario logado
     FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
-    DocumentSnapshot documentSnapshot = await
-    db.collection("requisicao_ativa_motorista")
-    .document(firebaseUser.uid).get();
+
+    //Recupera requisicao ativa
+    DocumentSnapshot documentSnapshot = await db
+        .collection("requisicao_ativa_motorista")
+        .document( firebaseUser.uid ).get();
+
     var dadosRequisicao = documentSnapshot.data;
-    if(dadosRequisicao == null){
-      _adicionarListenerRequisicao();
+
+    if( dadosRequisicao == null ){
+      _adicionarListenerRequisicoes();
     }else{
+
       String idRequisicao = dadosRequisicao["id_requisicao"];
-      Navigator.pushReplacementNamed(context, Rotas.ROTA_CORRIDA, arguments: idRequisicao);
+      Navigator.pushReplacementNamed(
+          context,
+          "/corrida",
+          arguments: idRequisicao
+      );
+
     }
 
   }
+
   @override
   void initState() {
     super.initState();
-    _recuperaRequisicaoAtiva();
+
+    /*
+    Recupera requisicao ativa para verificar se motorista está
+    atendendo alguma requisição e envia ele para tela de corrida
+    */
+    _recuperaRequisicaoAtivaMotorista();
 
   }
 
