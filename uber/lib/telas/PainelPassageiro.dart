@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber/Rotas.dart';
 import 'package:uber/model/Destino.dart';
+import 'package:uber/model/Marcador.dart';
 import 'package:uber/model/Requisicao.dart';
 import 'package:uber/model/Usuario.dart';
 import 'package:uber/util/StatusRequisicao.dart';
@@ -290,40 +291,44 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
 
     double latitudeMotorista = _dadosRequisicao["motorista"]["latitude"];
     double longitudeMotorista = _dadosRequisicao["motorista"]["longitude"];
-
-    //Exibir dois marcadores
-    _exibirDoisMarcadores(
+    Marcador marcadorOrigem = Marcador(
         LatLng(latitudeMotorista, longitudeMotorista),
-        LatLng(latitudePassageiro, longitudePassageiro)
+        "imagens/motorista.png",
+        "Local motorista"
     );
-
-    //'southwest.latitude <= northeast.latitude': is not true
-    var nLat, nLon, sLat, sLon;
-
-    if( latitudeMotorista <=  latitudePassageiro ){
-      sLat = latitudeMotorista;
-      nLat = latitudePassageiro;
-    }else{
-      sLat = latitudePassageiro;
-      nLat = latitudeMotorista;
-    }
-
-    if( longitudeMotorista <=  longitudePassageiro ){
-      sLon = longitudeMotorista;
-      nLon = longitudePassageiro;
-    }else{
-      sLon = longitudePassageiro;
-      nLon = longitudeMotorista;
-    }
-    //-23.560925, -46.650623
-    _movimentarCameraBounds(
-        LatLngBounds(
-            northeast: LatLng(nLat, nLon), //nordeste
-            southwest: LatLng(sLat, sLon) //sudoeste
-        )
+    Marcador marcadorDestino = Marcador(
+        LatLng(latitudePassageiro, longitudePassageiro),
+        "imagens/passageiro.png",
+        "Meu local"
+    );
+    _exivirCentralizarDoisMarcadores(marcadorOrigem, marcadorDestino);
+  }
+  _statusEmViagem() {
+    _exibirCaixaEnderecoDestino = false;
+    _alterarBotaoPrincipal(
+        "Finalizar corrida",
+        Colors.grey,
+      null
     );
 
 
+    double latitudeDestino = _dadosRequisicao["destino"]["latitude"];
+    double longitudeDestino  = _dadosRequisicao["destino"]["longitude"];
+
+    double latitudeOrigem = _dadosRequisicao["motorista"]["latitude"];
+    double longitudeOrigem = _dadosRequisicao["motorista"]["longitude"];
+
+    Marcador marcadorOrigem = Marcador(
+        LatLng(latitudeOrigem, longitudeOrigem),
+      "imagens/motorista.png",
+      "Local motorista"
+    );
+    Marcador marcadorDestino = Marcador(
+        LatLng(latitudeDestino, longitudeDestino),
+        "imagens/destino.png",
+        "Local motorista"
+    );
+    _exivirCentralizarDoisMarcadores(marcadorOrigem, marcadorDestino);
   }
 
   _movimentarCameraBounds(LatLngBounds latLngBounds) async {
@@ -336,36 +341,74 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
             100
         )
     );
+  }
+  _exivirCentralizarDoisMarcadores(Marcador marcadorOrigem, Marcador marcadorDestino)async{
+    double latitudeOrigem = marcadorOrigem.local.latitude;
+    double longitudeOrigem = marcadorOrigem.local.longitude;
 
+    double latitudeDestino = marcadorDestino.local.latitude;
+    double longitudeDestino = marcadorDestino.local.longitude;
+    //Exibir dois marcadores
+    _exibirDoisMarcadores(
+        marcadorOrigem,
+        marcadorDestino
+    );
+
+    //'southwest.latitude <= northeast.latitude': is not true
+    var nLat, nLon, sLat, sLon;
+
+    if( latitudeOrigem <=  latitudeDestino ){
+      sLat = latitudeOrigem;
+      nLat = latitudeDestino;
+    }else{
+      sLat = latitudeDestino;
+      nLat = latitudeOrigem;
+    }
+
+    if( longitudeOrigem <=  longitudeDestino ){
+      sLon = longitudeOrigem;
+      nLon = longitudeDestino;
+    }else{
+      sLon = longitudeDestino;
+      nLon = longitudeOrigem;
+    }
+    //-23.560925, -46.650623
+    _movimentarCameraBounds(
+        LatLngBounds(
+            northeast: LatLng(nLat, nLon), //nordeste
+            southwest: LatLng(sLat, sLon) //sudoeste
+        )
+    );
   }
 
-  _exibirDoisMarcadores(LatLng latLngMotorista, LatLng latLngPassageiro){
+  _exibirDoisMarcadores(Marcador marcadorOrigem, Marcador marcadorDestino){
 
     double pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
+    LatLng latLngOrigem = marcadorOrigem.local;
+    LatLng latLngDestino = marcadorDestino.local;
     Set<Marker> _listaMarcadores = {};
     BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: pixelRatio),
-        "imagens/motorista.png")
+        marcadorOrigem.camingoImagem)
         .then((BitmapDescriptor icone) {
-      Marker marcador1 = Marker(
-          markerId: MarkerId("marcador-motorista"),
-          position: LatLng(latLngMotorista.latitude, latLngMotorista.longitude),
-          infoWindow: InfoWindow(title: "Local motorista"),
+      Marker _marcadorOrigem = Marker(
+          markerId: MarkerId(marcadorOrigem.camingoImagem),
+          position: LatLng(latLngOrigem.latitude, latLngOrigem.longitude),
+          infoWindow: InfoWindow(title: marcadorOrigem.titulo),
           icon: icone);
-      _listaMarcadores.add( marcador1 );
+      _listaMarcadores.add( _marcadorOrigem );
     });
 
     BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: pixelRatio),
-        "imagens/passageiro.png")
+        marcadorDestino.camingoImagem)
         .then((BitmapDescriptor icone) {
-      Marker marcador2 = Marker(
-          markerId: MarkerId("marcador-passageiro"),
-          position: LatLng(latLngPassageiro.latitude, latLngPassageiro.longitude),
-          infoWindow: InfoWindow(title: "Local passageiro"),
+      Marker _marcadorDestino = Marker(
+          markerId: MarkerId(marcadorDestino.camingoImagem),
+          position: LatLng(latLngDestino.latitude, latLngDestino.longitude),
+          infoWindow: InfoWindow(title: marcadorDestino.titulo),
           icon: icone);
-      _listaMarcadores.add( marcador2 );
+      _listaMarcadores.add( _marcadorDestino );
     });
 
     setState(() {
@@ -438,7 +481,7 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
             _statusACaminho();
             break;
           case StatusRequisicao.VIAGEM :
-
+            _statusEmViagem();
             break;
           case StatusRequisicao.FINALIZADA :
 
