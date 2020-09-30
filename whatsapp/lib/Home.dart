@@ -118,7 +118,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           AbaConversas(),
           AbaConversas(),
           AbaStatus(),
-          AbaStatus(),
+          Container(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
