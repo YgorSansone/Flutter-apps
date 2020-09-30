@@ -24,7 +24,7 @@ class PainelPassageiro extends StatefulWidget {
 class _PainelPassageiroState extends State<PainelPassageiro> {
   TextEditingController _controllerDestino =
       TextEditingController(text: "R. Heitor Penteado, 800");
-  List<String> itensMenu = ["Configurações", "Deslogar"];
+  List<String> itensMenu = ["Deslogar"];
   Completer<GoogleMapController> _controller = Completer();
   CameraPosition _posicaoCamera =
       CameraPosition(target: LatLng(-23.563999, -46.653256));
@@ -491,6 +491,9 @@ class _PainelPassageiroState extends State<PainelPassageiro> {
             break;
           case StatusRequisicao.A_CAMINHO:
             _statusACaminho();
+            break;
+          case StatusRequisicao.CANCELADA:
+            _statusUberNaoChamado();
             break;
           case StatusRequisicao.VIAGEM:
             _statusEmViagem();
