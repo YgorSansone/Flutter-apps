@@ -12,7 +12,7 @@ import 'package:uber/model/Usuario.dart';
 import 'package:uber/util/StatusRequisicao.dart';
 import 'package:uber/util/UsuarioFirebase.dart';
 import '../Rotas.dart';
-
+import 'package:intl/intl.dart';
 class Corrida extends StatefulWidget {
   String idRequisicao;
   Corrida(this.idRequisicao);
@@ -171,10 +171,13 @@ class _CorridaState extends State<Corrida> {
             _statusACaminho();
             break;
           case StatusRequisicao.VIAGEM :
-
+            _statusEmViagem();
             break;
           case StatusRequisicao.FINALIZADA :
-
+            _statusFinalizada();
+            break;
+          case StatusRequisicao.CONFIRMADA :
+            _statusConfirmada();
             break;
 
         }
@@ -258,6 +261,133 @@ class _CorridaState extends State<Corrida> {
     }else{
       sLon = longitudePassageiro;
       nLon = longitudeMotorista;
+    }
+    //-23.560925, -46.650623
+    _movimentarCameraBounds(
+        LatLngBounds(
+            northeast: LatLng(nLat, nLon), //nordeste
+            southwest: LatLng(sLat, sLon) //sudoeste
+        )
+    );
+
+  }
+  _finalizarCorrida()async{
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+    .document(_idRequisicao)
+    .updateData({
+      "status": StatusRequisicao.FINALIZADA
+    });
+
+    String idPassageiro = _dadosRequisicao["passageiro"]["idUsuario"];
+    db.collection("requisicao_ativa")
+        .document( idPassageiro )
+        .updateData({"status": StatusRequisicao.FINALIZADA });
+
+    String idMotorista = _dadosRequisicao["motorista"]["idUsuario"];
+    db.collection("requisicao_ativa_motorista")
+        .document( idMotorista )
+        .updateData({"status": StatusRequisicao.FINALIZADA });
+
+  }
+  _confirmarCorrida(){
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+        .document( _idRequisicao )
+        .updateData({
+      "status" : StatusRequisicao.CONFIRMADA
+    });
+
+    String idPassageiro = _dadosRequisicao["passageiro"]["idUsuario"];
+    db.collection("requisicao_ativa")
+        .document( idPassageiro )
+        .delete();
+
+    String idMotorista = _dadosRequisicao["motorista"]["idUsuario"];
+    db.collection("requisicao_ativa_motorista")
+        .document( idMotorista )
+        .delete();
+  }
+  _statusFinalizada() async{
+    double latitudeDestino = _dadosRequisicao["destino"]["latitude"];
+    double longitudeDestino  = _dadosRequisicao["destino"]["longitude"];
+
+    double latitudeOrigem = _dadosRequisicao["origem"]["latitude"];
+    double longitudeOrigem = _dadosRequisicao["origem"]["longitude"];
+    double distaciaEmMetros = await Geolocator().distanceBetween(
+        latitudeOrigem,
+        longitudeOrigem,
+        latitudeDestino,
+        longitudeDestino);
+    double distanciaKm = distaciaEmMetros/1000;
+    double valorViagem = distanciaKm * 8;
+    var valorFormatador = new NumberFormat("#,##0.00", "pt_BR");
+    var valorViagemFormatado = valorFormatador.format(valorViagem);
+    _mensagemStatus = "Finalizada";
+    _alterarBotaoPrincipal(
+        "Confirmar - R\$ ${valorViagemFormatado}",
+        Color(0xff1ebbd8),
+            (){
+          _confirmarCorrida();
+        }
+    );
+    Position position = Position(
+        latitude: latitudeDestino, longitude: longitudeDestino
+    );
+    _exibirMarcador(
+        position,
+        "imagens/destino.png",
+        "Destino"
+    );
+
+    CameraPosition cameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude), zoom: 19);
+
+    _movimentarCamera( cameraPosition );
+  }
+  _statusConfirmada(){
+    Navigator.pushReplacementNamed(context, Rotas.ROTA_P_MOTORISTA);
+  }
+  _statusEmViagem() {
+    _mensagemStatus = "Em viagem";
+    _alterarBotaoPrincipal(
+        "Finalizar corrida",
+        Color(0xff1ebbd8),
+            (){
+          _finalizarCorrida();
+        }
+    );
+
+
+    double latitudeDestino = _dadosRequisicao["destino"]["latitude"];
+    double longitudeDestino  = _dadosRequisicao["destino"]["longitude"];
+
+    double latitudeOrigem = _dadosRequisicao["motorista"]["latitude"];
+    double longitudeOrigem = _dadosRequisicao["motorista"]["longitude"];
+
+    //Exibir dois marcadores
+    _exibirDoisMarcadores(
+        LatLng(latitudeOrigem, longitudeOrigem),
+        LatLng(latitudeDestino,longitudeDestino)
+    );
+
+    //'southwest.latitude <= northeast.latitude': is not true
+    var nLat, nLon, sLat, sLon;
+
+    if( latitudeOrigem <=  latitudeDestino ){
+      sLat = latitudeOrigem;
+      nLat = latitudeDestino;
+    }else{
+      sLat = latitudeDestino;
+      nLat = latitudeOrigem;
+    }
+
+    if( longitudeOrigem <=  longitudeDestino ){
+      sLon = longitudeOrigem;
+      nLon = longitudeDestino;
+    }else{
+      sLon = longitudeDestino;
+      nLon = longitudeOrigem;
     }
     //-23.560925, -46.650623
     _movimentarCameraBounds(
