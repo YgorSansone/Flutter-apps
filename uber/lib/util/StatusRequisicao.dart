@@ -4,4 +4,5 @@ class StatusRequisicao{
   static const String VIAGEM = "viagem";
   static const String FINALIZADA = "finalizada";
   static const String CANCELADA = "cancelada";
+  static const String CONFIRMADA = "confirmada";
 }
