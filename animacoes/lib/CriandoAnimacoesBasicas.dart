@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 class CriandoAnimacoesBasicas extends StatefulWidget {
   @override
   _CriandoAnimacoesBasicasState createState() => _CriandoAnimacoesBasicasState();
@@ -21,10 +22,24 @@ class _CriandoAnimacoesBasicasState extends State<CriandoAnimacoesBasicas> {
       //   height: _status?0 : 100,
       // ),
 
-      body: AnimatedContainer(
-        duration: Duration(seconds: 1),
-        color: Colors.green,
-        padding: EdgeInsets.only(bottom: 100, top: 20),
+      // body: AnimatedContainer(
+      //   duration: Duration(seconds: 1),
+      //   color: Colors.green,
+      //   padding: EdgeInsets.only(bottom: 100, top: 20),
+      //   alignment:_status ?  Alignment.bottomCenter :  Alignment.topCenter,
+      //   child: AnimatedOpacity(
+      //     duration: Duration(seconds: 1),
+      //     opacity: _status?1:0,
+      //     child: Container(
+      //       height: 50,
+      //       child: Icon(
+      //         Icons.airplanemode_active,
+      //         size: 50,
+      //         color: Colors.white,
+      //       ),
+      //     ),
+      //   )
+      // ),
 
       ),
 
