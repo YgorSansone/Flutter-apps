@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,7 +10,24 @@ class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<Login> with SingleTickerProviderStateMixin{
+  AnimationController _controller;
+  Animation<double> _animacaoBluer;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 500),
+      vsync: this
+    );
+    _animacaoBluer = Tween<double>(
+      begin: 5,
+      end: 0
+    ).animate(CurvedAnimation(
+        parent: _controller,
+    curve: Curves.ease));
+    _controller.forward();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,24 +36,35 @@ class _LoginState extends State<Login> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                height: 400,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("imagens/fundo.png"),
-                        fit: BoxFit.fill)),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 10,
-                      child: Image.asset("imagens/detalhe1.png"),
-                    ),
-                    Positioned(
-                      left: 50,
-                      child: Image.asset("imagens/detalhe2.png"),
-                    )
-                  ],
-                ),
+              AnimatedBuilder(
+                animation: _animacaoBluer ,
+                builder: (context, widget){
+                  return Container(
+                      height: 400,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage("imagens/fundo.png"),
+                              fit: BoxFit.fill)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(
+                            sigmaX: _animacaoBluer.value,
+                            sigmaY: _animacaoBluer.value
+                        ),
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 10,
+                              child: Image.asset("imagens/detalhe1.png"),
+                            ),
+                            Positioned(
+                              left: 50,
+                              child: Image.asset("imagens/detalhe2.png"),
+                            )
+                          ],
+                        ),
+                      )
+                  );
+                },
               ),
               Padding(
                 padding: EdgeInsets.only(left: 30, right: 30),
