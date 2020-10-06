@@ -40,7 +40,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    timeDilation = 20;
+    // timeDilation = 20;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
