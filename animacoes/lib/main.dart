@@ -4,10 +4,11 @@ import 'AnimacaoImplicita.dart';
 import 'AnimacaoTween.dart';
 import 'AnimacoesExplicitasContruidas.dart';
 import 'CriandoAnimacoesBasicas.dart';
+import 'MaisSobreAnimacoes.dart';
 
 void main() {
 runApp(  MaterialApp(
-  home: AnimacoesExplicitasConstruidas(),
+  home: MaisSobreAnimacoes(),
   debugShowCheckedModeBanner: false,
 ));
 }
