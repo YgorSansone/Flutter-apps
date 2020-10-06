@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:ishow/InputCustomizado.dart';
+
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
@@ -17,11 +20,9 @@ class _LoginState extends State<Login> {
               Container(
                 height: 400,
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("imagens/fundo.png"),
-                    fit: BoxFit.fill
-                  )
-                ),
+                    image: DecorationImage(
+                        image: AssetImage("imagens/fundo.png"),
+                        fit: BoxFit.fill)),
                 child: Stack(
                   children: [
                     Positioned(
@@ -36,39 +37,70 @@ class _LoginState extends State<Login> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 30,right: 30),
-                child: Column(children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey[200],
-                          blurRadius: 15,
-                          spreadRadius: 4
-                        )
-                      ]
-                    ),
-                    child: Column(
-                      children: [
-                        TextField(
-                          decoration: InputDecoration(
-                            hintText: "Email"
+                padding: EdgeInsets.only(left: 30, right: 30),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey[200],
+                                blurRadius: 15,
+                                spreadRadius: 4)
+                          ]),
+                      child: Column(
+                        children: [
+                          InputCustomizado(
+                            hint: "Email",
+                            obscure: false,
+                            icon: Icon(Icons.person),
                           ),
-                        )
-                      ],
+                          InputCustomizado(
+                            hint: "Senha",
+                            obscure: true,
+                            icon: Icon(Icons.lock),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20,),
-                  // InkWell(),
-                  SizedBox(height: 10,),
-                  Text("Esqueci a minha senha", style: TextStyle(
-                    color: Color.fromRGBO(255, 100, 127, 1),
-                    fontWeight: FontWeight.bold
-                  ),)
-                ],),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    InkWell(
+                      onTap: () {},
+                      child: Container(
+                        height: 50,
+                        child: Center(
+                          child: Text("Entrar", style: TextStyle(
+                            color: Colors.white,fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          ),),
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromRGBO(255, 100, 127, 1),
+                              Color.fromRGBO(255, 123, 145, 1),
+                            ]
+                          )
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Esqueci a minha senha",
+                      style: TextStyle(
+                          color: Color.fromRGBO(255, 100, 127, 1),
+                          fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
               )
             ],
           ),
