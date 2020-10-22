@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:olx/models/Usuario.dart';
 
+import '../RouteGenerator.dart';
 import 'InputCustomizado.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class Home extends StatefulWidget {
+class Login extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _LoginState createState() => _LoginState();
 }
 
-class _HomeState extends State<Home> {
+class _LoginState extends State<Login> {
   bool _showPassword = false;
   bool _cadastrar = false;
   TextEditingController _controllerEmail =
@@ -25,7 +26,7 @@ class _HomeState extends State<Home> {
         .createUserWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-
+          Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.ROTA, (_) => false);
     });
   }
 
@@ -35,7 +36,7 @@ class _HomeState extends State<Home> {
         .signInWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-
+      Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.ROTA, (_) => false);
     });
   }
 
@@ -116,7 +117,7 @@ class _HomeState extends State<Home> {
                       setState(() {
                         _cadastrar = valor;
                         _textoBotao = "Entrar";
-                        if(_cadastrar){
+                        if (_cadastrar) {
                           _textoBotao = "Cadastrar";
                         }
                       });
@@ -130,7 +131,9 @@ class _HomeState extends State<Home> {
                   ),
                   color: Color(0xff9c27b0),
                   padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  onPressed: () {_validarCampos();}),
+                  onPressed: () {
+                    _validarCampos();
+                  }),
               Padding(
                 padding: EdgeInsets.only(top: 20),
                 child: Text(
