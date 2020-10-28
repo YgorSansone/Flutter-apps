@@ -36,7 +36,8 @@ dependencies:
 #  cloud_firestore: ^0.14.1+3
   firebase_storage: ^3.1.5
   cloud_firestore: ^0.13.5
-
+  validadores: ^1.0.2
+  brasil_fields: ^0.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
