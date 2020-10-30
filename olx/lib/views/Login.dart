@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:olx/models/Usuario.dart';
-import 'package:olx/views/InputCustomizado.dart';
+import 'package:olx/views/widgets/BotaoCustomizado.dart';
+import 'package:olx/views/widgets/InputCustomizado.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -136,19 +137,7 @@ class _LoginState extends State<Login> {
                     Text("Cadastrar"),
                   ],
                 ),
-                RaisedButton(
-                  child: Text(
-                    _textoBotao,
-                    style: TextStyle(
-                      color: Colors.white, fontSize: 20
-                    ),
-                  ),
-                  color: Color(0xff9c27b0),
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  onPressed: (){
-                    _validarCampos();
-                  },
-                ),
+                BotaoCustomizado(texto: _textoBotao, corTexto: Colors.white, onPressed: _validarCampos(),),
                 Padding(
                   padding: EdgeInsets.only(top: 20),
                   child: Text(_mensagemErro, style: TextStyle(
